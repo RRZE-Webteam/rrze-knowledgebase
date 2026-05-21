@@ -1,0 +1,22 @@
+{
+    "name": "rrze/rrze-knowledgebase",
+    "description": "RRZE WordPress Plugin for Knowledgebase",
+    "version": "1.0.0",
+    "type": "wordpress-plugin",
+    "license": "GPL",
+    "require": {
+        "php": "^8.0.0",
+        "rrze/wp": "^1.2.1"
+    },
+    "suggest": {
+        "ext-mbstring": "*",
+        "ext-intl": "*"
+    },
+    "autoload": {
+        "psr-0": {
+        },
+        "psr-4": {
+            "RRZE\\Knowledgebase\\": "includes/"
+        }
+    }
+}

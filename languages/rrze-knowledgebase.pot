@@ -1,0 +1,195 @@
+# Copyright (C) 2026 RRZE Webteam
+# This file is distributed under the GNU General Public License v3.0.
+msgid ""
+msgstr ""
+"Project-Id-Version: RRZE Knowledgebase 1.0.0\n"
+"Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/rrze-knowledgebase\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"POT-Creation-Date: 2026-05-21T15:00:20+00:00\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"X-Generator: WP-CLI 2.11.0\n"
+"X-Domain: rrze-knowledgebase\n"
+
+#. Plugin Name of the plugin
+#: rrze-knowledgebase.php
+msgid "RRZE Knowledgebase"
+msgstr ""
+
+#. Plugin URI of the plugin
+#: rrze-knowledgebase.php
+msgid "https://github.com/RRZE-Webteam/rrze-knowledgebase"
+msgstr ""
+
+#. Description of the plugin
+#: rrze-knowledgebase.php
+msgid "Plugin for adding knowledgebase articles to a WordPress website"
+msgstr ""
+
+#. Author of the plugin
+#: rrze-knowledgebase.php
+msgid "RRZE Webteam"
+msgstr ""
+
+#. Author URI of the plugin
+#: rrze-knowledgebase.php
+msgid "https://www.wp.rrze.fau.de/"
+msgstr ""
+
+#: includes/CPT.php:21
+msgctxt "post type general name"
+msgid "KB Article"
+msgstr ""
+
+#: includes/CPT.php:22
+msgctxt "post type singular name"
+msgid "KB Article"
+msgstr ""
+
+#: includes/CPT.php:23
+msgctxt "admin menu"
+msgid "Knowledge Base"
+msgstr ""
+
+#: includes/CPT.php:24
+msgctxt "add new on admin bar"
+msgid "KB Articles"
+msgstr ""
+
+#: includes/CPT.php:25
+msgctxt "admin menu"
+msgid "Add New"
+msgstr ""
+
+#: includes/CPT.php:26
+msgid "Add New KB Article"
+msgstr ""
+
+#: includes/CPT.php:27
+msgid "New KB Article"
+msgstr ""
+
+#: includes/CPT.php:28
+msgid "Edit KB Article"
+msgstr ""
+
+#: includes/CPT.php:29
+msgid "View KB Article"
+msgstr ""
+
+#: includes/CPT.php:30
+msgid "All KB Articles"
+msgstr ""
+
+#: includes/CPT.php:31
+msgid "Search KB Articles"
+msgstr ""
+
+#: includes/CPT.php:32
+msgid "Parent KB Articles:"
+msgstr ""
+
+#: includes/CPT.php:33
+msgid "No KB articles found."
+msgstr ""
+
+#: includes/CPT.php:34
+msgid "No KB articles found in Trash."
+msgstr ""
+
+#: includes/CPT.php:35
+msgid "KB Article icon"
+msgstr ""
+
+#: includes/CPT.php:36
+msgid "Set KB article icon"
+msgstr ""
+
+#: includes/CPT.php:37
+msgid "Remove KB article icon"
+msgstr ""
+
+#: includes/CPT.php:38
+msgid "Use as KB article icon"
+msgstr ""
+
+#: includes/CPT.php:39
+msgid "Insert into KB article"
+msgstr ""
+
+#: includes/CPT.php:40
+msgid "Uploaded to this KB article"
+msgstr ""
+
+#: includes/CPT.php:66
+msgctxt "Taxonomy general name"
+msgid "KB Categories"
+msgstr ""
+
+#: includes/CPT.php:67
+msgctxt "Taxonomy singular name"
+msgid "KB Category"
+msgstr ""
+
+#: includes/CPT.php:68
+msgctxt "Taxonomy plural name"
+msgid "KB Categories"
+msgstr ""
+
+#: includes/CPT.php:69
+msgctxt "Taxonomy singular name"
+msgid "Edit KB Category"
+msgstr ""
+
+#: includes/CPT.php:70
+msgctxt "Taxonomy singular name"
+msgid "Add New KB Category"
+msgstr ""
+
+#: includes/CPT.php:89
+msgctxt "Taxonomy general name"
+msgid "KB Tags"
+msgstr ""
+
+#: includes/CPT.php:90
+msgctxt "Taxonomy singular name"
+msgid "KB Tag"
+msgstr ""
+
+#: includes/CPT.php:91
+msgctxt "Taxonomy plural name"
+msgid "KB Tags"
+msgstr ""
+
+#: includes/CPT.php:92
+msgctxt "Taxonomy singular name"
+msgid "Edit KB Tag"
+msgstr ""
+
+#: includes/CPT.php:93
+msgctxt "Taxonomy singular name"
+msgid "Add New KB Tag"
+msgstr ""
+
+#. translators: 1: Server PHP version number, 2: Required PHP version number.
+#: rrze-knowledgebase.php:63
+msgid "The server is running PHP version %1$s. The Plugin requires at least PHP version %2$s."
+msgstr ""
+
+#. translators: 1: Server WordPress version number, 2: Required WordPress version number.
+#: rrze-knowledgebase.php:70
+msgid "The server is running WordPress version %1$s. The Plugin requires at least WordPress version %2$s."
+msgstr ""
+
+#. translators: 1: The plugin name, 2: The error string.
+#: rrze-knowledgebase.php:89
+#: rrze-knowledgebase.php:146
+msgid "Plugins: %1$s: %2$s"
+msgstr ""
+
+#: rrze-knowledgebase.php:189
+msgid "RRZE"
+msgstr ""

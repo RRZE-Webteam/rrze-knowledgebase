@@ -1,0 +1,71 @@
+{
+    "_readme": [
+        "This file locks the dependencies of your project to a known state",
+        "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
+        "This file is @generated automatically"
+    ],
+    "content-hash": "de3e9b334e4c6a2b5d8f162964e9440f",
+    "packages": [
+        {
+            "name": "rrze/wp",
+            "version": "1.2.2",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/RRZE-Webteam/rrze-wp.git",
+                "reference": "b0c51e6a07011ec1d3ebf8a71fae5a93c05a6014"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/RRZE-Webteam/rrze-wp/zipball/b0c51e6a07011ec1d3ebf8a71fae5a93c05a6014",
+                "reference": "b0c51e6a07011ec1d3ebf8a71fae5a93c05a6014",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=8.0"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "RRZE\\WP\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "GPL-3.0-or-later"
+            ],
+            "authors": [
+                {
+                    "name": "Rolf v. d. Forst",
+                    "email": "rolf.v.d.forst@fau.de",
+                    "homepage": "https://www.rrze.fau.de"
+                },
+                {
+                    "name": "Benjamin Klemencic",
+                    "email": "benjamin.klemencic@fau.de",
+                    "homepage": "https://www.rrze.fau.de"
+                }
+            ],
+            "description": "A general purpose library for WordPress.",
+            "homepage": "https://github.com/RRZE-Webteam/rrze-wp",
+            "keywords": [
+                "wordpress"
+            ],
+            "support": {
+                "issues": "https://github.com/RRZE-Webteam/rrze-wp/issues",
+                "source": "https://github.com/RRZE-Webteam/rrze-wp/tree/1.2.2"
+            },
+            "time": "2023-11-28T09:49:37+00:00"
+        }
+    ],
+    "packages-dev": [],
+    "aliases": [],
+    "minimum-stability": "stable",
+    "stability-flags": [],
+    "prefer-stable": false,
+    "prefer-lowest": false,
+    "platform": {
+        "php": "^8.0.0"
+    },
+    "platform-dev": [],
+    "plugin-api-version": "2.6.0"
+}
