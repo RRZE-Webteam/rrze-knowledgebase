@@ -12,13 +12,17 @@ class CPT
     {
         add_action('init', [$this, 'register_post_type'], 9);
         add_action('init', [$this, 'register_taxonomies'], 9);
-        //add_action('add_meta_boxes', [$this, 'render_metabox']);
+        add_action('add_meta_boxes', [$this, 'add_meta_box'] );
+        add_action( 'save_post', [$this, 'save_postdata'] );
+        //add_filter('single_template', [$this, 'include_single_template']);
+        add_filter('archive_template', [$this, 'include_archive_template']);
+        add_action('pre_get_posts', [$this, 'modify_archive_query']);
     }
 
     public function register_post_type()
     {
         $labels = [
-            'name'               => _x('KB Article', 'post type general name', 'rrze-knowledgebase'),
+            'name'               => _x('KB Articles', 'post type general name', 'rrze-knowledgebase'),
             'singular_name'      => _x('KB Article', 'post type singular name', 'rrze-knowledgebase'),
             'menu_name'          => _x('Knowledge Base', 'admin menu', 'rrze-knowledgebase'),
             'name_admin_bar'     => _x('KB Articles', 'add new on admin bar', 'rrze-knowledgebase'),
@@ -32,10 +36,10 @@ class CPT
             'parent_item_colon'  => __('Parent KB Articles:', 'rrze-knowledgebase'),
             'not_found'          => __('No KB articles found.', 'rrze-knowledgebase'),
             'not_found_in_trash' => __('No KB articles found in Trash.', 'rrze-knowledgebase'),
-            'featured_image'        => __( 'KB Article icon', 'rrze-knowledgebase' ),    //used in post.php
-            'set_featured_image'    => __( 'Set KB article icon', 'rrze-knowledgebase' ),    //used in post.php
-            'remove_featured_image' => __( 'Remove KB article icon', 'rrze-knowledgebase' ), //used in post.php
-            'use_featured_image'    => __( 'Use as KB article icon', 'rrze-knowledgebase' ), //used in post.php
+            'featured_image'        => __( 'KB Article image', 'rrze-knowledgebase' ),    //used in post.php
+            'set_featured_image'    => __( 'Set KB article image', 'rrze-knowledgebase' ),    //used in post.php
+            'remove_featured_image' => __( 'Remove KB article image', 'rrze-knowledgebase' ), //used in post.php
+            'use_featured_image'    => __( 'Use as KB article image', 'rrze-knowledgebase' ), //used in post.php
             'insert_into_item'      => __( 'Insert into KB article', 'rrze-knowledgebase' ),  //used in post.php
             'uploaded_to_this_item' => __( 'Uploaded to this KB article', 'rrze-knowledgebase' ), //used in post.php
 
@@ -52,8 +56,8 @@ class CPT
             'has_archive'        => true,
             'exclude_from_search' => false,
             'publicly_queryable' => true,
-            'rewrite'            => ['slug' => self::POST_TYPE],
-            'show_in_rest'       => false,
+            'rewrite'            => ['slug' => 'kb-article'],
+            'show_in_rest'       => true,
         ];
 
         register_post_type(self::POST_TYPE, $args);
@@ -81,6 +85,11 @@ class CPT
                 'delete_terms'  => 'manage_options',
                 'assign_terms'  => 'edit_pages'
             ],
+            'rewrite'           => [
+                'slug' => 'kb-category',
+                'with_front' => false,
+                'hierarchical' => true
+            ],
         ];
         register_taxonomy('rrze-kb-category', self::POST_TYPE, $args);
 
@@ -104,8 +113,96 @@ class CPT
                 'delete_terms'  => 'manage_options',
                 'assign_terms'  => 'edit_pages'
             ],
+            'rewrite'           => [
+                'slug' => 'kb-tag',
+                'with_front' => false,
+                'hierarchical' => true
+            ],
         ];
         register_taxonomy('rrze-kb-tag', self::POST_TYPE, $args);
+    }
+
+    public function add_meta_box() {
+        add_meta_box(
+            'kb_article_views',
+            __('KB Article views', 'rrze-knowledgebase'),
+            [$this, 'meta_box_html'],
+            self::POST_TYPE,
+            'side'
+        );
+    }
+
+    public function meta_box_html($post) {
+        $value = get_post_meta( $post->ID, 'kb_article_views', true );
+        ?>
+        <label for="kb_article_views"><?php _e('Article views', 'rrze-knowledgebase'); ?></label>
+        <input id="kb-article-views" name="kb-article-views" type="number" value="<?php echo esc_html($value); ?>" min="0">
+        <?php
+    }
+
+    public  function save_postdata( $post_id ) {
+        if ( array_key_exists( 'kb_article_views', $_POST ) ) {
+            $views = (int) $_POST['kb_article_views'];
+            update_post_meta(
+                $post_id,
+                'kb_article_views',
+                $views
+            );
+        }
+    }
+
+    public static function include_archive_template($template_path)
+    {
+        $current_object = get_queried_object();
+        if (isset($current_object->query_var) && $current_object->name != self::POST_TYPE)
+            return $template_path;
+        if (isset($current_object->taxonomy) && !in_array($current_object->taxonomy, ['rrze-kb-category', 'rrze-kb-tag']))
+            return $template_path;
+
+        if ($theme_file = locate_template(array('archive-kb-article.php'))) {
+            $template_path = $theme_file;
+        } else {
+            $template_path = plugin()->getPath() . '/templates/archive-kb-article.php';
+        }
+        wp_enqueue_style('rrze-knowledgebase-style');
+
+        return $template_path;
+    }
+
+    public function include_single_template($template_path)
+    {
+        global $post;
+        if (!($post->post_type == self::POST_TYPE)) {
+            return $template_path;
+        }
+
+        $template_path = plugin()->getPath() . 'templates/single-kb-article.php';
+
+        wp_enqueue_style('rrze-knowledgebase-style');
+
+        return $template_path;
+    }
+
+    public function modify_archive_query($query) {
+        if (
+            is_admin()
+            || !$query->is_main_query()
+            || !is_tax('rrze-kb-category')
+        ) {
+            return;
+        }
+
+        $term = get_queried_object();
+
+        $query->set('tax_query', [
+            [
+                'taxonomy'         => 'rrze-kb-category',
+                'field'            => 'term_id',
+                'terms'            => [$term->term_id],
+                'include_children' => false,
+            ]
+        ]);
+
     }
 
 }

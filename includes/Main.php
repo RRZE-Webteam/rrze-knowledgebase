@@ -11,14 +11,14 @@ class Main
      */
     public function __construct()
     {
-        add_action('wp_enqueue_scripts', [$this, 'wpEnqueueScripts']);
-        add_action('admin_enqueue_scripts', [$this, 'adminEnqueueScripts']);
-        //$settings = new Settings();
+        add_action('wp_enqueue_scripts', [$this, 'enqueue_scripts']);
+        add_action('admin_enqueue_scripts', [$this, 'admin_enqueue_scripts']);
+        $settings = new Settings();
         //$settings->onLoaded();
         new CPT();
     }
 
-    public function wpEnqueueScripts()
+    public function enqueue_scripts()
     {
         wp_register_style(
             'rrze-knowledgebase-style',
@@ -38,7 +38,7 @@ class Main
         ]);*/
     }
 
-    public function adminEnqueueScripts()
+    public function admin_enqueue_scripts()
     {
         /*wp_enqueue_style(
             'rrze-knowledgebase-admin-style',
