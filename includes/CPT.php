@@ -17,6 +17,7 @@ class CPT
         //add_filter('single_template', [$this, 'include_single_template']);
         add_filter('archive_template', [$this, 'include_archive_template']);
         add_action('pre_get_posts', [$this, 'modify_archive_query']);
+        add_action('init', [$this, 'flush_rewrite'], 99);
     }
 
     public function register_post_type()
@@ -44,7 +45,9 @@ class CPT
             'uploaded_to_this_item' => __( 'Uploaded to this KB article', 'rrze-knowledgebase' ), //used in post.php
 
         ];
-        
+
+        $options = get_option('rrze-kb');
+        $slug    = $options[ 'slug' ] ?? 'knowledge-base';
         $args = [
             'labels'             => $labels,
             'hierarchical'       => false,
@@ -53,10 +56,13 @@ class CPT
             'supports'           => ['title', 'editor', 'revisions', 'author', 'excerpt', 'page-attributes', 'thumbnail'],
             'menu_icon'          => 'dashicons-lightbulb',
             'capability_type'    => 'page',
-            'has_archive'        => true,
+            'has_archive' => sanitize_title($slug),
             'exclude_from_search' => false,
             'publicly_queryable' => true,
-            'rewrite'            => ['slug' => 'kb-article'],
+            'rewrite' => [
+                'slug' => sanitize_title($slug),
+                'with_front' => false,
+            ],
             'show_in_rest'       => true,
         ];
 
@@ -203,6 +209,15 @@ class CPT
             ]
         ]);
 
+    }
+
+    public function flush_rewrite() {
+        if ( ! get_option( 'rrze_kb_flush_rewrite' ) ) {
+            return;
+        }
+
+        flush_rewrite_rules();
+        delete_option( 'rrze_kb_flush_rewrite' );
     }
 
 }

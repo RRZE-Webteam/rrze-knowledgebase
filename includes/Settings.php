@@ -4,21 +4,23 @@ namespace RRZE\Knowledgebase;
 
 class Settings
 {
-    private string $option_name = 'my_plugin_settings';
+    private string $option_name = 'rrze-kb';
 
     public function __construct()
     {
         add_action('admin_menu', [$this, 'add_options_page']);
         add_action('admin_init', [$this, 'register_settings']);
+        add_action('update_option_rrze-kb',[$this, 'modify_slug'], 10, 2);
+
     }
 
     public function add_options_page(): void
     {
         add_options_page(
-            'Plugin Settings',
-            'Plugin Settings',
+            __('RRZE Knowledgebase Settings', 'rrze-knowledgebase'),
+            __('RRZE Knowledgebase', 'rrze-knowledgebase'),
             'manage_options',
-            'my-plugin-settings',
+            'rrze-kb-settings',
             [$this, 'render_settings_page']
         );
     }
@@ -26,30 +28,34 @@ class Settings
     public function register_settings(): void
     {
         register_setting(
-            'my_plugin_settings_group',
-            $this->option_name
+            'rrze-kb-group',
+            $this->option_name,
+            [
+                'sanitize_callback' => [$this, 'sanitize_settings'],
+            ]
         );
     }
 
     public function render_settings_page(): void
     {
         $options = get_option($this->option_name, [
-            'rrze-kb-slug' => '',
+            'name' => __('Knowledge Base', 'rrze-knowledgebase'),
+            'slug' => __('knowledgebase', 'rrze-knowledgebase'),
             'layout' => 'table',
         ]);
 
         $active_tab = $_GET['tab'] ?? 'data';
         ?>
         <div class="wrap">
-            <h1>Plugin Settings</h1>
+            <h1><?php _e('RRZE Knowledgebase Settings', 'rrze-knowledgebase') ?></h1>
 
             <h2 class="nav-tab-wrapper">
-                <a href="?page=my-plugin-settings&tab=data"
+                <a href="?page=rrze-kb-settings&tab=data"
                    class="nav-tab <?php echo $active_tab === 'data' ? 'nav-tab-active' : ''; ?>">
                     Data
                 </a>
 
-                <a href="?page=my-plugin-settings&tab=layout"
+                <a href="?page=rrze-kb-settings&tab=layout"
                    class="nav-tab <?php echo $active_tab === 'layout' ? 'nav-tab-active' : ''; ?>">
                     Layout
                 </a>
@@ -57,7 +63,7 @@ class Settings
 
             <form method="post" action="options.php">
                 <?php
-                settings_fields('my_plugin_settings_group');
+                settings_fields('rrze-kb-group');
                 ?>
 
                 <table class="form-table">
@@ -65,14 +71,28 @@ class Settings
 
                         <tr>
                             <th scope="row">
-                                <label for="rrze-kb-slug">rrze-kb-slug</label>
+                                <label for="<?php echo esc_attr($this->option_name); ?>-name"><?php _e('Name', 'rrze-knowledgebase'); ?></label>
                             </th>
                             <td>
                                 <input
                                     type="text"
-                                    id="rrze-kb-slug"
-                                    name="<?php echo esc_attr($this->option_name); ?>[rrze-kb-slug]"
-                                    value="<?php echo esc_attr($options['rrze-kb-slug'] ?? ''); ?>"
+                                    id="<?php echo esc_attr($this->option_name); ?>-name"
+                                    name="<?php echo esc_attr($this->option_name); ?>[name]"
+                                    value="<?php echo esc_attr($options['name'] ?? __('Knowledge Base', 'rrze-knowledgebase')); ?>"
+                                    class="regular-text"
+                                >
+                            </td>
+                        </tr>
+                        <tr>
+                            <th scope="row">
+                                <label for="<?php echo esc_attr($this->option_name); ?>-slug"><?php _e('Slug', 'rrze-knowledgebase'); ?></label>
+                            </th>
+                            <td>
+                                <input
+                                    type="text"
+                                    id="<?php echo esc_attr($this->option_name); ?>-slug"
+                                    name="<?php echo esc_attr($this->option_name); ?>[slug]"
+                                    value="<?php echo esc_attr($options['slug'] ?? __('knowledgebase', 'rrze-knowledgebase')); ?>"
                                     class="regular-text"
                                 >
                             </td>
@@ -81,13 +101,13 @@ class Settings
                     <?php elseif ($active_tab === 'layout') : ?>
 
                         <tr>
-                            <th scope="row">Layout</th>
+                            <th scope="row"><?php _e('Layout', 'rrze-knowledgebase'); ?></th>
                             <td>
                                 <?php
                                 $layouts = [
-                                    'table' => 'Table',
-                                    'grid'  => 'Grid',
-                                    'list'  => 'List',
+                                    'table' => __('Table', 'rrze-knowledgebase'),
+                                    'grid'  => __('Grid', 'rrze-knowledgebase'),
+                                    'list'  => __('List', 'rrze-knowledgebase'),
                                 ];
 
                                 foreach ($layouts as $value => $label) :
@@ -95,9 +115,9 @@ class Settings
                                     <label style="display:block; margin-bottom:8px;">
                                         <input
                                             type="radio"
-                                            name="<?php echo esc_attr($this->option_name); ?>[layout]"
+                                            name="<?php echo esc_attr($this->option_name); ?>[rrze-kb-layout]"
                                             value="<?php echo esc_attr($value); ?>"
-                                            <?php checked($options['layout'] ?? 'table', $value); ?>
+                                            <?php checked($options['rrze-kb-layout'] ?? 'table', $value); ?>
                                         >
                                         <?php echo esc_html($label); ?>
                                     </label>
@@ -113,4 +133,41 @@ class Settings
         </div>
         <?php
     }
+
+    public function sanitize_settings(array $input): array
+    {
+        $output = [];
+
+        // Name
+        $output['name'] = isset($input['name'])
+            ? sanitize_text_field($input['name'])
+            : '';
+
+        // Slug
+        $output['slug'] = isset($input['slug'])
+            ? sanitize_title($input['slug'])
+            : '';
+
+        // Layout
+        $allowed_layouts = ['table', 'grid', 'list'];
+
+        $output['layout'] = in_array($input['layout'] ?? '', $allowed_layouts, true)
+            ? $input['layout']
+            : 'table';
+
+        return $output;
+    }
+
+    public function modify_slug($old, $new) {
+
+        $old_slug = sanitize_title( $old['slug'] ?? '' );
+        $new_slug = sanitize_title( $new['slug'] ?? '' );
+
+        if ( $old_slug !== $new_slug ) {
+            update_option( 'rrze_kb_flush_rewrite', 1 );
+        }
+
+    }
+
+
 }

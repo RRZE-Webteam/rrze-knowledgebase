@@ -7,27 +7,50 @@ class Output
     private $category;
     private $subcategories;
 
-    public function __construct($category)
+    public function __construct($object)
     {
-        $this->category = $category;
-        if ( ! isset($this->category->term_id)) {
-            $this->subcategories = [];
-        } else {
-            $this->subcategories = get_categories([
-                                                      'taxonomy'   => 'rrze-kb-category',
-                                                      'parent'     => $this->category->term_id,
-                                                      'hide_empty' => false,
-                                                  ]);
+        //var_dump($object);
+        /*if ( is_post_type_archive()) {
+
+        } else*/if (is_a($object, 'WP_Term')) {
+            $this->category = $object;
+            if ( ! isset($this->category->term_id)) {
+                $this->subcategories = [];
+            } else {
+                $this->subcategories = get_categories([
+                    'taxonomy'   => 'rrze-kb-category',
+                    'parent'     => $this->category->term_id,
+                    'hide_empty' => false,
+                ]);
+            }
         }
     }
 
     public function render()
     {
-        $parent = ( isset( $this->category->parent ) ) ? get_term_by( 'id', $this->category->parent, 'rrze-kb-category' ) : false;
+        if (isset($this->category->parent)) {
+            $parents = Helper::get_term_parents_recursive($this->category->term_id, 'rrze-kb-category');
+            $parents = array_reverse($parents);
+        } else {
+            $parents = false;
+        }
+        $options = get_option('rrze-kb');
+        $kb_name = $options['name'] ?? __('Knowledge Base', 'rrze-knowledgebase');
+
+        $title = single_cat_title('', false);
 
         $output = '<div class="rrze-kb-category-page">'
-                  . ($parent ? '<a href="' . esc_url(get_category_link($parent->term_id)) . '" class="kb-category-back-link"><span class="dashicons dashicons-arrow-up-alt2"></span>' . $parent->name . '</a>' : '')
-                  . '<h1>' . single_cat_title('', false) . '</h1>';
+            . '<ul class="kb-category-breadcrumbs">'
+            . '<li><a href="' . esc_url(get_post_type_archive_link('rrze-kb-article')) . '" class="kb-category-back-link">' . $kb_name . '</a></li>';
+        if ($parents) {
+            foreach ($parents as $parent) {
+                $output .= '<li><a href="' . esc_url(get_category_link($parent->term_id)) . '" class="kb-category-back-link">' . esc_html($parent->name) . '</a></li>';
+            }
+        }
+        $output .= '<li><span class="kb-category-current-item">' . $title . '</span></li>'
+            . '</ul>';
+
+        $output .= '<h1>' . $title . '</h1>';
 
         if ( ! empty($this->subcategories)) :
 
@@ -50,13 +73,11 @@ class Output
 
             $output .= '</div>';
 
-        else:
-
-            $output .= '<p class="nothing-found">' . __('No articles found.', 'rrze-knowledgebase') . '</p>';
-
         endif;
 
-
+        if (empty($this->subcategories) && !have_posts()) :
+            $output .= '<p class="nothing-found">' . __('No articles found.', 'rrze-knowledgebase') . '</p>';
+        endif;
 
         $output .= '</div>';
 
