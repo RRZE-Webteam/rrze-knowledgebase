@@ -5,12 +5,12 @@
     margin: 0 auto 2em;
     padding: 20px;
 
-    .kb-subcategory-grid {
+    .kb-category-grid {
         display: grid;
         grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
         gap: 20px;
 
-        .kb-subcategory-card {
+        .kb-category-card {
             display: flex;
             flex-direction: column;
             justify-content: space-between;
@@ -26,7 +26,7 @@
                 padding-bottom: 0.5em;
                 margin-bottom: 0.5em;
             }
-            .kb-subcategory-description {
+            .kb-category-description {
                 font-size: 0.8em;
             }
             ul.kb-subsubcategories,

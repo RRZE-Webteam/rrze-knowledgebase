@@ -14,7 +14,7 @@ class CPT
         add_action('init', [$this, 'register_taxonomies'], 9);
         add_action('add_meta_boxes', [$this, 'add_meta_box'] );
         add_action( 'save_post', [$this, 'save_postdata'] );
-        //add_filter('single_template', [$this, 'include_single_template']);
+        add_filter('single_template', [$this, 'include_single_template']);
         add_filter('archive_template', [$this, 'include_archive_template']);
         add_action('pre_get_posts', [$this, 'modify_archive_query']);
         add_action('init', [$this, 'flush_rewrite'], 99);

@@ -10,9 +10,13 @@ class Output
     public function __construct($object)
     {
         //var_dump($object);
-        /*if ( is_post_type_archive()) {
-
-        } else*/if (is_a($object, 'WP_Term')) {
+        if ( is_post_type_archive()) {
+            $this->subcategories = get_categories([
+                'taxonomy'   => 'rrze-kb-category',
+                'parent'     => 0,
+                'hide_empty' => false,
+            ]);
+        } elseif (is_a($object, 'WP_Term')) {
             $this->category = $object;
             if ( ! isset($this->category->term_id)) {
                 $this->subcategories = [];
@@ -26,7 +30,7 @@ class Output
         }
     }
 
-    public function render()
+    public function render_archive()
     {
         if (isset($this->category->parent)) {
             $parents = Helper::get_term_parents_recursive($this->category->term_id, 'rrze-kb-category');
@@ -85,19 +89,28 @@ class Output
         return $output;
     }
 
+    public function render_single() {
+        $output = '<div class="rrze-kb-article-page">'
+            . '<nav class="kb-category-navigation">' . '</nav>';
+
+
+        $output .= '</div>';
+        return $output;
+    }
+
     private function render_subcategories($subcategories)
     {
-        $output = '<div class="kb-subcategory-grid">';
+        $output = '<div class="kb-category-grid">';
 
         foreach ($subcategories as $subcategory) :
             //var_dump($subcategory);
 
-            $output .= '<article class="kb-subcategory-card">'
+            $output .= '<article class="kb-category-card">'
                        . '<h1><a href="' . esc_url(get_category_link($subcategory->term_id)) . '">'
                        . esc_html($subcategory->name) . '</a></h1>';
 
             if ($subcategory->description) :
-                $output .= '<p class="kb-subcategory-description">' . esc_html($subcategory->description) . '</p>';
+                $output .= '<p class="kb-category-description">' . esc_html($subcategory->description) . '</p>';
             endif;
 
             $subarticles = get_posts([
@@ -107,6 +120,7 @@ class Output
                                              'taxonomy' => 'rrze-kb-category',
                                              'field'    => 'term_id',
                                              'terms'    => $subcategory->term_id,
+                                             'include_children' => false,
                                          ]]
                                      ]);
 
@@ -138,12 +152,11 @@ class Output
                 $output .= '<ul class="kb-subsubcategories">';
 
                 foreach ($subsubcategories as $subsubcategory) :
-                    // print "<pre>"; print_r($subsubcategory); print "</pre>";
                     $output .= '<li class="">'
                                . '<a href="' . esc_url(get_category_link($subsubcategory->term_id)) . '" class="kb-subsubcategories">'
                                . '<span class="dashicons dashicons-category"></span>'
                                . esc_html($subsubcategory->name)
-                               . '</a></li>';
+                               . '</a> (' . esc_html($subsubcategory->count) . ')</li>';
                 endforeach;
 
                 $output .= '</ul>';

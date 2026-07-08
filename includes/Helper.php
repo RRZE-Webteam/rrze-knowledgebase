@@ -33,4 +33,28 @@ class Helper
         return $parents;
     }
 
+    public static function make_breadcrumbs($category = null) {
+
+        if (!is_a($category, 'WP_Term')) {
+            return '';
+        }
+
+        $output = '<ul class="kb-category-breadcrumbs">'
+                  . '<li><a href="' . esc_url(get_post_type_archive_link('rrze-kb-article')) . '" class="kb-category-back-link">' . $kb_name . '</a></li>';
+        if ($parents) {
+            foreach ($parents as $parent) {
+                $output .= '<li><a href="' . esc_url(get_category_link($parent->term_id)) . '" class="kb-category-back-link">' . esc_html($parent->name) . '</a></li>';
+            }
+        }
+        $output .= '<li><span class="kb-category-current-item">' . $title . '</span></li>'
+                   . '</ul>';
+    }
+
+    public static function make_context_menu() {
+
+        $output = '';
+
+        return $output;
+    }
+
 }
