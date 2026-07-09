@@ -26,13 +26,13 @@ class Main
             [],
             plugin()->getVersion(true)
         );
-        /*wp_register_script(
+        wp_register_script(
             'rrze-knowledgebase-script',
             plugins_url('assets/js/rrze-knowledgebase.js', plugin()->getBasename()),
-            ['jquery'],
+            [],
             plugin()->getVersion(true)
         );
-        wp_localize_script('rrze-knowledgebase-script', 'rrze_knowledgebase_ajax', [
+        /*wp_localize_script('rrze-knowledgebase-script', 'rrze_knowledgebase_ajax', [
             'ajax_url' => admin_url('admin-ajax.php'),
             'nonce' => wp_create_nonce( 'rrze-knowledgebase-ajax-nonce' ),
         ]);*/

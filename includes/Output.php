@@ -9,7 +9,6 @@ class Output
 
     public function __construct($object)
     {
-        //var_dump($object);
         if ( is_post_type_archive()) {
             $this->subcategories = get_categories([
                 'taxonomy'   => 'rrze-kb-category',
@@ -27,32 +26,18 @@ class Output
                     'hide_empty' => false,
                 ]);
             }
+        } elseif (is_a($object, 'WP_Post')) {
+            $terms = get_the_terms( $object->ID, 'rrze-kb-category' );
+            $this->category = $terms[0] ?? null;
         }
     }
 
     public function render_archive()
     {
-        if (isset($this->category->parent)) {
-            $parents = Helper::get_term_parents_recursive($this->category->term_id, 'rrze-kb-category');
-            $parents = array_reverse($parents);
-        } else {
-            $parents = false;
-        }
-        $options = get_option('rrze-kb');
-        $kb_name = $options['name'] ?? __('Knowledge Base', 'rrze-knowledgebase');
-
         $title = single_cat_title('', false);
 
         $output = '<div class="rrze-kb-category-page">'
-            . '<ul class="kb-category-breadcrumbs">'
-            . '<li><a href="' . esc_url(get_post_type_archive_link('rrze-kb-article')) . '" class="kb-category-back-link">' . $kb_name . '</a></li>';
-        if ($parents) {
-            foreach ($parents as $parent) {
-                $output .= '<li><a href="' . esc_url(get_category_link($parent->term_id)) . '" class="kb-category-back-link">' . esc_html($parent->name) . '</a></li>';
-            }
-        }
-        $output .= '<li><span class="kb-category-current-item">' . $title . '</span></li>'
-            . '</ul>';
+            . Helper::make_breadcrumbs($this->category);
 
         $output .= '<h1>' . $title . '</h1>';
 
@@ -89,16 +74,37 @@ class Output
         return $output;
     }
 
-    public function render_single() {
+    public function render_single(): string
+    {
+        global $post;
+        $modifiedHtml = Helper::make_toc(get_the_content());
+        $toc = $modifiedHtml['toc'] ?? '';
+        $content = $modifiedHtml['html'] ?? '';
+        $context_menu = Helper::make_context_menu($post);
         $output = '<div class="rrze-kb-article-page">'
-            . '<nav class="kb-category-navigation">' . '</nav>';
+        // Breadcrumbs
+            . Helper::make_breadcrumbs($post)
+            . '<div class="rrze-kb-article-inner">';
+        // ToC
+        if (!empty($toc)) {
+            $output .= '<div class="rrze-kb-toc-container"><h2 id="rrze-kb-toc-title">' . __('Table of contents', 'rrze-knowledgebase') . '</h2>' . '<nav class="rrze-kb-toc" aria-labelledby="rrze-kb-toc-title">' . $toc . '</nav></div>';
+        }
+        // Article
+        $output .= '<article class="entry-content">'
+                      . '<header class="entry-header"><h1 class="entry-title">' . get_the_title() . '</h1></header>'
+                      . $content
+                . '</article>';
+        // Context Menu
+        if (!empty($context_menu)) {
+            $output .= '<nav class="rrze-kb-context-menu" aria-label="' . __('Side Menu', 'rrze-knowledgebase') . '">' . $context_menu . '</nav>';
+        }
+        $output .='</div></div>';
 
-
-        $output .= '</div>';
-        return $output;
+        wp_enqueue_script('rrze-knowledgebase-script');
+        return wp_kses_post($output);
     }
 
-    private function render_subcategories($subcategories)
+    private function render_subcategories($subcategories): string
     {
         $output = '<div class="kb-category-grid">';
 
