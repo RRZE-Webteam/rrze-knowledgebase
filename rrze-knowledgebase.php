@@ -1,7 +1,7 @@
 <?php
 
 /*
-Plugin Name:    RRZE Knowledgebase
+Plugin Name:    RRZE Knowledge Base
 Plugin URI:     https://github.com/RRZE-Webteam/rrze-knowledgebase
 Description:    Plugin for adding knowledgebase articles to a WordPress website
 Version:        1.0.0
@@ -84,12 +84,12 @@ function activation()
     if ($error = systemRequirements()) {
         deactivate_plugins(plugin_basename(__FILE__));
         wp_die(
-            sprintf(
+            esc_html(sprintf(
             /* translators: 1: The plugin name, 2: The error string. */
                 __('Plugins: %1$s: %2$s', 'rrze-knowledgebase'),
                 plugin_basename(__FILE__),
                 $error
-            )
+            ))
         );
     }
 
@@ -140,14 +140,14 @@ function loaded()
                 $pluginName = $pluginData['Name'];
                 $tag = is_plugin_active_for_network(plugin()->getBaseName()) ? 'network_admin_notices' : 'admin_notices';
                 add_action($tag, function () use ($pluginName, $error) {
-                    printf(
+                    printf(esc_html(
                         '<div class="notice notice-error"><p>' .
                         /* translators: 1: The plugin name, 2: The error string. */
                         __('Plugins: %1$s: %2$s', 'rrze-knowledgebase') .
                         '</p></div>',
-                        esc_html($pluginName),
-                        esc_html($error)
-                    );
+                        $pluginName,
+                        $error
+                    ));
                 });
             }
         });

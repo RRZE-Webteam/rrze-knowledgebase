@@ -56,6 +56,7 @@ class Helper
         $options = get_option('rrze-kb');
         $kb_name = $options['name'] ?? __('Knowledge Base', 'rrze-knowledgebase');
 
+        /* translators: %s: Knowledge Base name */
         $output = '<nav class="kb-category-navigation" aria-label="' . sprintf(esc_attr__('%s Breadcrumb Navigation', 'rrze-knowledgebase'), $kb_name) . '">'
                   . '<ul class="kb-category-breadcrumbs">'
                   . '<li><a href="' . esc_url(get_post_type_archive_link('rrze-kb-article')) . '" class="kb-category-back-link">' . $kb_name . '</a></li>';
@@ -180,7 +181,8 @@ class Helper
         ];
     }
 
-    public static function make_context_menu($post = null) {
+    public static function make_context_menu($post = null)
+    {
         if (is_null($post)) {
             return '';
         }
@@ -189,7 +191,9 @@ class Helper
         if (empty($terms) || is_wp_error($terms)) {
             return '';
         }
+
         $category = $terms[0];
+
         $parents = [];
         if (!empty($category->parent)) {
             $parents = Helper::get_term_parents_recursive($category->term_id, 'rrze-kb-category');
@@ -197,12 +201,12 @@ class Helper
         }
 
         $parentIds = array_column($parents, 'term_id');
-        $parentIds[] = $category->term_id; // optional: aktuelles Element ebenfalls berücksichtigen
+        $parentIds[] = $category->term_id;
 
-        return self::render_category_tree(0, $parentIds);
+        return self::render_category_tree(0, $parentIds, $category->term_id, $post->ID);
     }
 
-    private static function render_category_tree($parent, $parentIds)
+    private static function render_category_tree($parent, $parentIds, $currentCategoryId, $currentPostId)
     {
         $terms = get_terms([
                                'taxonomy'   => 'rrze-kb-category',
@@ -219,13 +223,56 @@ class Helper
         $output = '<ul>';
 
         foreach ($terms as $term) {
+
             $output .= '<li>';
-            $output .= '<a href="' . esc_url(get_category_link($term->term_id)) . '">';
+            $output .= '<a href="' . esc_url(get_category_link($term->term_id)) . '"><span class="dashicons dashicons-category"></span>';
             $output .= esc_html($term->name);
             $output .= '</a>';
 
             if (in_array($term->term_id, $parentIds, true)) {
-                $output .= self::render_category_tree($term->term_id, $parentIds);
+
+                // Nur in der aktuell geöffneten Kategorie die Beiträge anzeigen
+                if ($term->term_id === $currentCategoryId) {
+
+                    $posts = get_posts([
+                                           'post_type'      => 'rrze-kb-article',
+                                           'posts_per_page' => -1,
+                                           'orderby'        => 'title',
+                                           'order'          => 'ASC',
+                                           'tax_query'      => [
+                                               [
+                                                   'taxonomy' => 'rrze-kb-category',
+                                                   'field'    => 'term_id',
+                                                   'terms'    => $term->term_id,
+                                                   'include_children' => false,
+                                               ],
+                                           ],
+                                       ]);
+                    if ($posts) {
+                        $output .= '<ul class="rrze-kb-articles">';
+
+                        foreach ($posts as $post) {
+                            $class = ($post->ID === $currentPostId) ? ' class="current"' : '';
+
+                            $output .= sprintf(
+                                '<li%s><span class="current-article"><span class="dashicons dashicons-media-document"></span>%s</span></li>',
+                                $class,
+                                esc_html(get_the_title($post))
+                            );
+                        }
+
+                        $output .= '</ul>';
+                    }
+                }
+
+                // Unterkategorien
+                $output .= self::render_category_tree(
+                    $term->term_id,
+                    $parentIds,
+                    $currentCategoryId,
+                    $currentPostId
+                );
+
             }
 
             $output .= '</li>';

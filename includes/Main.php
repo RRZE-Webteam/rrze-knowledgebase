@@ -26,6 +26,12 @@ class Main
             [],
             plugin()->getVersion(true)
         );
+        $options = (new Settings)->get_options();
+        $default_color = $options['accent-color'];
+        $css = ':root {--rrze-kb-accent-color: ' . $default_color . ';';
+        // ToDo: Kontrastfarbe
+        wp_add_inline_style('rrze-knowledgebase-style', $css);
+
         wp_register_script(
             'rrze-knowledgebase-script',
             plugins_url('assets/js/rrze-knowledgebase.js', plugin()->getBasename()),

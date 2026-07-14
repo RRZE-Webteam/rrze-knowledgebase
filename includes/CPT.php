@@ -110,7 +110,7 @@ class CPT
         $args = [
             'labels'            => $labels,
             'public'            => true,
-            'hierarchical'      => true,
+            'hierarchical'      => false,
             'show_admin_column' => true,
             'show_in_rest'      => true,
             'capabilities'      => [
@@ -126,6 +126,34 @@ class CPT
             ],
         ];
         register_taxonomy('rrze-kb-tag', self::POST_TYPE, $args);
+
+        // Target Groups
+        $labels = [
+            'name'              => _x('KB Target Groups', 'Taxonomy general name', 'rrze-knowledgebase'),
+            'singular_name'     => _x('KB Target Group', 'Taxonomy singular name', 'rrze-knowledgebase'),
+            'plural_name'     => _x('KB Target Groups', 'Taxonomy plural name', 'rrze-knowledgebase'),
+            'edit_item'     => _x('KB Edit Target Group', 'Taxonomy singular name', 'rrze-knowledgebase'),
+            'add_new_item'     => _x('Add New KB Target Group', 'Taxonomy singular name', 'rrze-knowledgebase'),
+        ];
+        $args = [
+            'labels'            => $labels,
+            'public'            => true,
+            'hierarchical'      => true,
+            'show_admin_column' => true,
+            'show_in_rest'      => true,
+            'capabilities'      => [
+                'manage_terms'  => 'manage_options',
+                'edit_terms'    => 'manage_options',
+                'delete_terms'  => 'manage_options',
+                'assign_terms'  => 'edit_pages'
+            ],
+            'rewrite'           => [
+                'slug' => 'kb-target-group',
+                'with_front' => false,
+                'hierarchical' => true
+            ],
+        ];
+        register_taxonomy('rrze-kb-target-group', self::POST_TYPE, $args);
     }
 
     public function add_meta_box() {
@@ -140,21 +168,48 @@ class CPT
 
     public function meta_box_html($post) {
         $value = get_post_meta( $post->ID, 'kb_article_views', true );
+        wp_nonce_field(
+            'kb_article_views_action',
+            'kb_article_views_nonce'
+        );
         ?>
-        <label for="kb_article_views"><?php _e('Article views', 'rrze-knowledgebase'); ?></label>
-        <input id="kb-article-views" name="kb-article-views" type="number" value="<?php echo esc_html($value); ?>" min="0">
+        <label for="kb-article-views"><?php esc_html_e('Article views', 'rrze-knowledgebase'); ?></label>
+        <input id="kb-article-views" name="kb_article_views" type="number" value="<?php echo esc_html($value); ?>" min="0">
         <?php
     }
 
-    public  function save_postdata( $post_id ) {
-        if ( array_key_exists( 'kb_article_views', $_POST ) ) {
-            $views = (int) $_POST['kb_article_views'];
-            update_post_meta(
-                $post_id,
-                'kb_article_views',
-                $views
-            );
+    public function save_postdata( $post_id ) {
+
+        if (
+            ! isset( $_POST['kb_article_views_nonce'] ) ||
+            ! wp_verify_nonce( $_POST['kb_article_views_nonce'], 'kb_article_views_action' )
+        ) {
+            return;
         }
+
+        if ( defined( 'DOING_AUTOSAVE' ) && DOING_AUTOSAVE ) {
+            return;
+        }
+
+        if ( wp_is_post_revision( $post_id ) ) {
+            return;
+        }
+
+        if ( ! current_user_can( 'edit_post', $post_id ) ) {
+            return;
+        }
+
+        if ( ! isset( $_POST['kb_article_views'] ) ) {
+            return;
+        }
+
+        $views = absint( $_POST['kb_article_views'] );
+
+        update_post_meta(
+            $post_id,
+            'kb_article_views',
+            $views
+        );
     }
 
     public static function include_archive_template($template_path)

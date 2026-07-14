@@ -1,0 +1,30 @@
+{
+  "name": "rrze-knowledgebase",
+  "version": "1.0.0",
+  "main": "build/index.js",
+  "scripts": {
+    "build": "wp-scripts build",
+    "format": "wp-scripts format",
+    "lint:css": "wp-scripts lint-style",
+    "lint:js": "wp-scripts lint-js",
+    "packages-update": "wp-scripts packages-update",
+    "plugin-zip": "wp-scripts plugin-zip",
+    "start": "wp-scripts start"
+  },
+  "devDependencies": {
+    "@types/react": "^19.1.6",
+    "@types/wordpress__block-editor": "^11.5.16",
+    "@types/wordpress__blocks": "^12.5.16",
+    "@types/wordpress__components": "^23.0.12",
+    "@types/wordpress__element": "^2.4.1",
+    "@wordpress/scripts": "^30.20.0",
+    "baseline-browser-mapping": "^2.9.19",
+    "sass": "^1.85.0",
+    "typescript": "^5.8.3"
+  },
+  "dependencies": {
+    "@wordpress/block-editor": "^14.4.0",
+    "@wordpress/blocks": "^13.9.0",
+    "@wordpress/server-side-render": "^5.9.0"
+  }
+}
