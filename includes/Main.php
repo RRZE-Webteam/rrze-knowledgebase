@@ -36,7 +36,8 @@ class Main
             'rrze-knowledgebase-script',
             plugins_url('assets/js/rrze-knowledgebase.js', plugin()->getBasename()),
             [],
-            plugin()->getVersion(true)
+            plugin()->getVersion(true),
+            ['in_footer' => true]
         );
         /*wp_localize_script('rrze-knowledgebase-script', 'rrze_knowledgebase_ajax', [
             'ajax_url' => admin_url('admin-ajax.php'),

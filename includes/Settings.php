@@ -12,6 +12,7 @@ class Settings
         $this->defaults = [
             'name' => __('Knowledge Base', 'rrze-knowledgebase'),
             'slug' => __('knowledgebase', 'rrze-knowledgebase'),
+            'search-title' => __('What are you looking for?', 'rrze-knowledgebase'),
             'layout' => 'table',
             'accent-color' => '#04316a',
         ];
@@ -23,11 +24,16 @@ class Settings
     
     public function get_options(): array
     {
-        return get_option($this->option_name, $this->defaults);
+        $options = get_option($this->option_name, $this->defaults);
+        return array_merge($this->defaults, $options);
     }
 
-    public function get_defaults(): array
+    public function get_defaults($key = false): array|string
     {
+        if ($key) {
+            $defaults = $this->defaults;
+            return $defaults[ $key ] ?? '';
+        }
         return $this->defaults;
     }
 
@@ -55,9 +61,9 @@ class Settings
 
     public function render_settings_page(): void
     {
-        $options = get_option($this->option_name, $this->defaults);
+        $options = self::get_options();
 
-        $active_tab = $_GET['tab'] ?? 'data';
+        $active_tab = isset($_GET['tab']) ? sanitize_title(wp_unslash($_GET['tab'])) : 'data';
         ?>
         <div class="wrap">
             <h1><?php esc_html_e('RRZE Knowledge Base Settings', 'rrze-knowledgebase') ?></h1>
@@ -91,7 +97,7 @@ class Settings
                                     type="text"
                                     id="<?php echo esc_attr($this->option_name); ?>-name"
                                     name="<?php echo esc_attr($this->option_name); ?>[name]"
-                                    value="<?php echo esc_html($options['name'] ?? __('Knowledge Base', 'rrze-knowledgebase')); ?>"
+                                    value="<?php echo esc_html($options['name']); ?>"
                                     class="regular-text"
                                 >
                             </td>
@@ -105,7 +111,23 @@ class Settings
                                     type="text"
                                     id="<?php echo esc_attr($this->option_name); ?>-slug"
                                     name="<?php echo esc_attr($this->option_name); ?>[slug]"
-                                    value="<?php echo esc_attr($options['slug'] ?? __('knowledgebase', 'rrze-knowledgebase')); ?>"
+                                    value="<?php echo esc_attr($options['slug']); ?>"
+                                    class="regular-text"
+                                >
+                            </td>
+                        </tr>
+                        <tr>
+                            <th scope="row">
+                                <label for="<?php echo esc_attr($this->option_name); ?>-search-title">
+                                    <?php esc_html_e('Search Title', 'rrze-knowledgebase'); ?>
+                                </label>
+                            </th>
+                            <td>
+                                <input
+                                    type="text"
+                                    id="<?php echo esc_attr($this->option_name); ?>-search-title"
+                                    name="<?php echo esc_attr($this->option_name); ?>[search-title]"
+                                    value="<?php echo esc_attr($options['search-title']); ?>"
                                     class="regular-text"
                                 >
                             </td>
@@ -176,6 +198,11 @@ class Settings
         // Slug
         if (isset($input['slug'])) {
             $output['slug'] = sanitize_title($input['slug']);
+        }
+
+        // Name
+        if (isset($input['search-title'])) {
+            $output['search-title'] = sanitize_text_field($input['search-title']);
         }
 
         // Layout

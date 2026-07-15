@@ -180,13 +180,6 @@ class CPT
 
     public function save_postdata( $post_id ) {
 
-        if (
-            ! isset( $_POST['kb_article_views_nonce'] ) ||
-            ! wp_verify_nonce( $_POST['kb_article_views_nonce'], 'kb_article_views_action' )
-        ) {
-            return;
-        }
-
         if ( defined( 'DOING_AUTOSAVE' ) && DOING_AUTOSAVE ) {
             return;
         }
@@ -195,11 +188,16 @@ class CPT
             return;
         }
 
-        if ( ! current_user_can( 'edit_post', $post_id ) ) {
+        if ( ! isset( $_POST['kb_article_views'] ) ) {
             return;
         }
 
-        if ( ! isset( $_POST['kb_article_views'] ) ) {
+        if ( ! isset( $_POST['kb_article_views_nonce'] )
+             || ! wp_verify_nonce(sanitize_text_field( wp_unslash($_POST['kb_article_views_nonce']), 'kb_article_views_action' ))) {
+            return;
+        }
+
+        if ( ! current_user_can( 'edit_post', $post_id ) ) {
             return;
         }
 

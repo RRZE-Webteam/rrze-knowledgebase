@@ -36,12 +36,26 @@ class Output
 
     public function render_archive()
     {
-        $title = single_cat_title('', false);
+        if (is_post_type_archive()) {
+            $options = (new Settings)->get_options();
+            $title = $options['name'] ?? '';
+            $page_class = 'rrze-kb-start-page';
+        } else {
+            $title = single_cat_title('', false);
+            $page_class = 'rrze-kb-category-page';
+        }
 
-        $output = '<div class="rrze-kb-category-page">'
-            . Helper::make_breadcrumbs($this->category);
+        $context_menu = Helper::make_context_menu($this->category);
 
-        $output .= '<h1>' . $title . '</h1>';
+        $output = '<div class="' . $page_class . '">'
+            . Helper::make_breadcrumbs($this->category)
+            . '<div class="rrze-kb-category-inner">';
+
+        $output .= '<div class="entry-content"><h1>' . $title . '</h1>';
+
+        if (is_post_type_archive()) {
+            $output .= Helper::render_search();
+        }
 
         if (!is_post_type_archive() && have_posts()) :
 
@@ -71,6 +85,13 @@ class Output
         endif;
 
         $output .= '</div>';
+
+        // Context Menu
+        if (!empty($context_menu)) {
+            $output .= '<nav class="rrze-kb-context-menu" aria-label="' . __('Side Menu', 'rrze-knowledgebase') . '">' . $context_menu . '</nav>';
+        }
+
+        $output .= '</div></div>';
 
         wp_enqueue_style('dashicons');
         return $output;
@@ -135,9 +156,7 @@ class Output
     {
 
         if (is_post_type_archive('rrze-kb-article')) {
-            $options = (new Settings)->get_options();
-            $kb_name = $options['name'] ?? '';
-            $output = '<h1>' . $kb_name . '</h1>';
+            $output = '';
         } else {
             $output = '<h2>' . __('Subcategories', 'rrze-knowledgebase') . '</h2>';
         }
@@ -154,14 +173,19 @@ class Output
             endif;
 
             $subarticles = get_posts([
-                                         'post_type'      => 'rrze-kb-article',
-                                         'numberposts'   => -1,
-                                         'tax_query' => [[
-                                             'taxonomy' => 'rrze-kb-category',
-                                             'field'    => 'term_id',
-                                             'terms'    => $subcategory->term_id,
-                                             'include_children' => false,
-                                         ]]
+                                         'post_type'              => 'rrze-kb-article',
+                                         'posts_per_page'         => -1,
+                                         'no_found_rows'          => true,
+                                         'update_post_meta_cache' => false,
+                                         'update_post_term_cache' => false,
+                                         'tax_query'              => [
+                                             [
+                                                 'taxonomy'         => 'rrze-kb-category',
+                                                 'field'            => 'term_id',
+                                                 'terms'            => $subcategory->term_id,
+                                                 'include_children' => false,
+                                             ],
+                                         ],
                                      ]);
 
             if ( ! empty($subarticles)) :

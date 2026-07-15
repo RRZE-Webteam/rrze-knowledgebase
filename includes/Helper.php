@@ -181,18 +181,25 @@ class Helper
         ];
     }
 
-    public static function make_context_menu($post = null)
+    public static function make_context_menu($object = null)
     {
-        if (is_null($post)) {
+        if (is_null($object)) {
             return '';
         }
 
-        $terms = get_the_terms($post->ID, 'rrze-kb-category');
-        if (empty($terms) || is_wp_error($terms)) {
+        if (is_a($object, 'WP_Post')) {
+            $terms = get_the_terms($object->ID, 'rrze-kb-category');
+            if (empty($terms) || is_wp_error($terms)) {
+                return '';
+            }
+            $category = $terms[0];
+            $currentPostId = $object->ID;
+        } elseif (is_a($object, 'WP_Term')) {
+            $category = $object;
+            $currentPostId = null;
+        } else {
             return '';
         }
-
-        $category = $terms[0];
 
         $parents = [];
         if (!empty($category->parent)) {
@@ -203,7 +210,7 @@ class Helper
         $parentIds = array_column($parents, 'term_id');
         $parentIds[] = $category->term_id;
 
-        return self::render_category_tree(0, $parentIds, $category->term_id, $post->ID);
+        return self::render_category_tree(0, $parentIds, $category->term_id, $currentPostId);
     }
 
     private static function render_category_tree($parent, $parentIds, $currentCategoryId, $currentPostId)
@@ -239,6 +246,9 @@ class Helper
                                            'posts_per_page' => -1,
                                            'orderby'        => 'title',
                                            'order'          => 'ASC',
+                                           'no_found_rows'          => true,
+                                           'update_post_meta_cache' => false,
+                                           'update_post_term_cache' => false,
                                            'tax_query'      => [
                                                [
                                                    'taxonomy' => 'rrze-kb-category',
@@ -279,6 +289,44 @@ class Helper
         }
 
         $output .= '</ul>';
+
+        return $output;
+    }
+
+    public static function render_search() {
+        $options = (new Settings)->get_options();
+        $search_title = $options['search-title'];
+
+        $output = '<div class="rrze-kb-search">'
+            . '<h2 class="rrze-kb-search-title">' . $search_title . '</h2>'
+            . '<form class="rrze-kb-search-form" method="get">
+					<input type="search" name="kb-search" class="" value="' . (isset($_GET['kb-search']) ? sanitize_text_field($_GET['kb-search']) : '') . '" aria-label="' . __('Search the knowledge base', 'rrze-knowledgebase') . '" placeholder="' . __('Search the knowledge base', 'rrze-knowledgebase') . '" />
+					<input type="hidden" name="post_type" value="rrze-kb-article" />
+					<input type="submit" value="' . __('Search', 'rrze-knowledgebase') . '" />
+				</form>';
+
+        if (!empty($_GET['kb-search'])) {
+            $articles = get_posts([
+                'post_type'      => 'rrze-kb-article',
+                'posts_per_page' => -1,
+                'orderby'        => 'title',
+                'order'          => 'ASC',
+                'no_found_rows'          => true,
+                'update_post_meta_cache' => false,
+                'update_post_term_cache' => false,
+                's' => sanitize_text_field($_GET['kb-search']),
+            ]);
+            if (!empty($articles)) {
+                $output .= '<h3>' . __('Search Results', 'rrze-knowledgebase') . '</h3>'
+                    . '<ul class="rrze-kb-articles">';
+                foreach ($articles as $article) {
+                    $output .= '<li class="rrze-kb-article"><a href="' . get_the_permalink($article->ID) . '"><span class="dashicons dashicons-media-document"></span>' . esc_html(get_the_title($article->ID)) . '</a></li>';
+                }
+                $output .= '</ul>';
+            }
+        }
+
+        $output .= '</div>';
 
         return $output;
     }
