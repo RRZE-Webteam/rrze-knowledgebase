@@ -11,7 +11,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-07-22 10:07+0000\n"
+"POT-Creation-Date: 2026-07-21 13:21+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: Loco https://localise.biz/\n"
 "X-Domain: rrze-knowledgebase\n"
@@ -51,10 +51,6 @@ msgstr ""
 msgid "All KB Articles"
 msgstr ""
 
-#: includes/Helper.php:405 includes/Helper.php:422
-msgid "Apply filter"
-msgstr ""
-
 #: includes/CPT.php:176
 msgid "Article views"
 msgstr ""
@@ -63,7 +59,7 @@ msgstr ""
 msgid "Articles"
 msgstr ""
 
-#: includes/Helper.php:353
+#: includes/Helper.php:348
 msgid "Category"
 msgstr ""
 
@@ -111,12 +107,6 @@ msgstr ""
 msgid "knowledgebase"
 msgstr ""
 
-#. %s: Date + time
-#: includes/Output.php:125
-#, php-format
-msgid "Last modified: %s"
-msgstr ""
-
 #: includes/Settings.php:139
 msgid "Layout"
 msgstr ""
@@ -145,11 +135,11 @@ msgstr ""
 msgid "No KB articles found."
 msgstr ""
 
-#: includes/Helper.php:368
+#: includes/Helper.php:374
 msgid "No results found."
 msgstr ""
 
-#: includes/Helper.php:354
+#: includes/Helper.php:349
 msgid "Order by"
 msgstr ""
 
@@ -206,14 +196,18 @@ msgstr ""
 msgid "Search KB Articles"
 msgstr ""
 
-#: includes/Helper.php:365
+#: includes/Helper.php:371
 msgid "Search Results"
 msgstr ""
 
-#. %s: Knowledge Base name
-#: includes/Helper.php:349
+#: includes/Helper.php:346
 #, php-format
 msgid "Search the %s"
+msgstr ""
+
+#. %s: Knowledge Base name
+#: includes/Helper.php:346
+msgid "Search the knowledge base"
 msgstr ""
 
 #: includes/Settings.php:122
@@ -224,7 +218,7 @@ msgstr ""
 msgid "Set KB article image"
 msgstr ""
 
-#: includes/Output.php:94 includes/Output.php:156
+#: includes/Output.php:94 includes/Output.php:151
 msgid "Side Menu"
 msgstr ""
 
@@ -232,7 +226,7 @@ msgstr ""
 msgid "Slug"
 msgstr ""
 
-#: includes/Output.php:171
+#: includes/Output.php:166
 msgid "Subcategories"
 msgstr ""
 
@@ -240,15 +234,15 @@ msgstr ""
 msgid "Table"
 msgstr ""
 
-#: includes/Output.php:119
+#: includes/Output.php:117
 msgid "Table of contents"
 msgstr ""
 
-#: includes/Output.php:136
+#: includes/Output.php:131
 msgid "Tags"
 msgstr ""
 
-#: includes/Output.php:139
+#: includes/Output.php:134
 msgid "Target Groups"
 msgstr ""
 
@@ -351,7 +345,7 @@ msgstr ""
 msgid "Title (Z-A)"
 msgstr ""
 
-#: includes/Helper.php:478
+#: includes/Helper.php:466
 msgid "Uncategorized"
 msgstr ""
 

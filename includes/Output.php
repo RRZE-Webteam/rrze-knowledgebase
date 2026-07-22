@@ -65,7 +65,10 @@ class Output
 
                 $classes = get_post_class( '', get_the_ID() );
                 $output .= '<li class="' . esc_attr( implode( ' ', $classes ) ) . '">'
-                           . '<span class="dashicons dashicons-media-document"></span><a href="' . get_the_permalink() . '">' . get_the_title() . '</a>'
+                           . '<a href="' . get_the_permalink() . '">'
+                           . '<span class="dashicons dashicons-media-document"></span>'
+                           . '<span class="link-text">' . get_the_title() . '</span>'
+                           . '</a>'
                            . '</li>';
 
             endwhile;
@@ -94,6 +97,7 @@ class Output
         $output .= '</div></div>';
 
         wp_enqueue_style('dashicons');
+        wp_enqueue_script('rrze-knowledgebase-script');
         return $output;
     }
 
@@ -104,6 +108,8 @@ class Output
         $toc = $modifiedHtml['toc'] ?? '';
         $content = $modifiedHtml['html'] ?? '';
         $context_menu = Helper::make_context_menu($post);
+        $last_modified = get_the_modified_date(get_option( 'date_format' ) . ' - ' . get_option( 'time_format' ), $post);
+
         $output = '<div class="rrze-kb-article-page">'
         // Breadcrumbs
             . Helper::make_breadcrumbs($post)
@@ -114,32 +120,34 @@ class Output
         }
         // Article
         $output .= '<article class="entry-content">'
-                      . '<header class="entry-header"><h1 class="entry-title">' . get_the_title() . '</h1></header>'
+                      . '<header class="entry-header"><h1 class="entry-title">' . get_the_title() . '</h1>'
+                       /* translators: %s: Date + time */
+                       . '<p class="article-meta">' . sprintf(__('Last modified: %s', 'rrze-knowledgebase'), $last_modified) . '</p>';
+
+        $target_groups = get_the_terms($post->ID, 'rrze-kb-target-group');
+        if (!empty($target_groups) && !is_wp_error($target_groups)) {
+            $output .= '<div class="rrze-kb-target-groups">' . __('Target Groups', 'rrze-knowledgebase') . ': ' . '<ul class="kb-target-groups">';
+            foreach ($target_groups as $target_group) {
+                $link = get_term_link($target_group);
+                if (!is_wp_error($link)) {
+                    $output .= '<li><a href="' . esc_url($link) . '">' . esc_html($target_group->name) . '</a></li>';
+                } else {
+                    $output .= '<li>' . esc_html($target_group->name) . '</li>';
+                }
+            }
+            $output .= '</ul></div>';
+        }
+        $output .= '</header>'
                       . $content;
 
-        $terms = get_the_terms($post->ID, 'rrze-kb-tag');
-        $target_groups = get_the_terms($post->ID, 'rrze-kb-target-group');
-
-        if (!empty($terms) || !empty($target_groups)) {
-            $output .= '<footer class="entry-footer">';
-            if (!empty($terms) && !is_wp_error($terms)) {
-                $names = wp_list_pluck($terms, 'name');
-                $output .= '<div class="rrze-kb-tags">' . __('Tags', 'rrze-knowledgebase') . ': ' . implode(', ', $names) . '</div>';
-            }
-            if (!empty($target_groups) && !is_wp_error($target_groups)) {
-                $output .= '<div class="rrze-kb-target-groups">' . __('Target Groups', 'rrze-knowledgebase') . ': ' . '<ul class="kb-target-groups">';
-                foreach ($target_groups as $target_group) {
-                    $link = get_term_link($target_group);
-                    if (!is_wp_error($link)) {
-                        $output .= '<li><a href="' . esc_url($link) . '">' . esc_html($target_group->name) . '</a></li>';
-                    } else {
-                        $output .= '<li>' . esc_html($target_group->name) . '</li>';
-                    }
-                }
-                $output .= '</ul></div>';
-            }
-            $output .= '<footer class="entry-footer"></footer>';
+        $tags = get_the_terms($post->ID, 'rrze-kb-tag');
+        if (!empty($tags)) {
+            $names = wp_list_pluck($tags, 'name');
+            $output .= '<footer class="entry-footer">'
+                . '<div class="rrze-kb-tags">' . __('Tags', 'rrze-knowledgebase') . ': ' . implode(', ', $names) . '</div>'
+                . '<footer class="entry-footer"></footer>';
         }
+
         $output .= '</article>';
 
         // Context Menu
@@ -148,6 +156,7 @@ class Output
         }
         $output .='</div></div>';
 
+        wp_enqueue_style('dashicons');
         wp_enqueue_script('rrze-knowledgebase-script');
         return wp_kses_post($output);
     }
@@ -196,8 +205,8 @@ class Output
 
                     $output .= '<li class="">'
                                . '<a href="' . esc_url(get_permalink($subarticle->ID)) . '" class="kb-articles">'
-                               .'<span class="dashicons dashicons-media-document"></span>'
-                               . esc_html($subarticle->post_title)
+                               . '<span class="dashicons dashicons-media-document"></span>'
+                               . '<span class="link-text">' . esc_html($subarticle->post_title) . '</span>'
                                . '</a></li>';
                 endforeach;
 
@@ -216,11 +225,27 @@ class Output
                 $output .= '<ul class="kb-subsubcategories">';
 
                 foreach ($subsubcategories as $subsubcategory) :
+                    $count = (new \WP_Query([
+                                               'post_type'      => 'rrze-kb-article',
+                                               'post_status'    => 'publish',
+                                               'posts_per_page' => 1, // only 1 article is loaded, but all are counted
+                                               'fields'         => 'ids',
+                                               'tax_query'      => [
+                                                   [
+                                                       'taxonomy' => 'rrze-kb-category',
+                                                       'field'    => 'term_id',
+                                                       'terms'    => $subsubcategory->term_id,
+                                                   ],
+                                               ],
+                                           ]))->found_posts;
+
                     $output .= '<li class="">'
                                . '<a href="' . esc_url(get_category_link($subsubcategory->term_id)) . '" class="kb-subsubcategories">'
                                . '<span class="dashicons dashicons-category"></span>'
-                               . esc_html($subsubcategory->name)
-                               . '</a> (' . esc_html($subsubcategory->count) . ')</li>';
+                               . '<span class="link-text">' . esc_html($subsubcategory->name)
+                                    . '<span class="count"> (' . $count . ')</span>'
+                               . '</span>'
+                               . '</a></li>';
                 endforeach;
 
                 $output .= '</ul>';

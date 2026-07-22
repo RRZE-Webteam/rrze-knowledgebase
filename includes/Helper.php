@@ -231,10 +231,16 @@ class Helper
 
         foreach ($terms as $term) {
 
-            $output .= '<li>';
-            $output .= '<a href="' . esc_url(get_category_link($term->term_id)) . '"><span class="dashicons dashicons-category"></span>';
-            $output .= esc_html($term->name);
-            $output .= '</a>';
+            $is_parent = false;
+            if (in_array($term->term_id, $parentIds, true)) {
+                $is_parent = true;
+            }
+
+            $output .= '<li' . ($is_parent ? ' class="parent"' : '') . '>'
+                . '<a href="' . esc_url(get_category_link($term->term_id)) . '">'
+                . '<span class="dashicons dashicons-category"></span>'
+                . '<span class="link-text">' . esc_html($term->name) . '</span>'
+                . '</a>';
 
             if (in_array($term->term_id, $parentIds, true)) {
 
@@ -262,12 +268,22 @@ class Helper
                         $output .= '<ul class="rrze-kb-articles">';
 
                         foreach ($posts as $post) {
-                            $class = ($post->ID === $currentPostId) ? ' class="current"' : '';
+                            if ($post->ID === $currentPostId){
+                                $class = ' class="current"';
+                                $link_open = '<span class="current-item">';
+                                $link_close = '</span>';
+                            } else {
+                                $class = '';
+                                $link_open = '<a href="' . get_the_permalink($post->ID) . '">';
+                                $link_close = '</a>';
+                            }
 
                             $output .= sprintf(
-                                '<li%s><span class="current-article"><span class="dashicons dashicons-media-document"></span>%s</span></li>',
+                                '<li%s>%s<span class="dashicons dashicons-media-document"></span><span class="link-text">%s</span>%s</li>',
                                 $class,
-                                esc_html(get_the_title($post))
+                                $link_open,
+                                esc_html(get_the_title($post->ID)),
+                                $link_close
                             );
                         }
 
@@ -296,39 +312,242 @@ class Helper
     public static function render_search() {
         $options = (new Settings)->get_options();
         $search_title = $options['search-title'];
+        $kb_name = $options['name'] ?? __('Knowledge Base', 'rrze-knowledgebase');
+        $categories = get_terms([
+            'taxonomy'   => 'rrze-kb-category',
+            'hide_empty' => false,
+            'parent'     => 0,
+            'orderby'    => 'name',
+            'order'      => 'ASC',
+                                ]);
+        $category_options = [];
+        foreach ($categories as $category) {
+            $category_options[$category->term_id] = $category->name;
+        }
+        $category_selected = [];
+        if (!empty($_GET['kb-category'])) {
+            array_walk($_GET['kb-category'], 'absint');
+            $category_selected = $_GET['kb-category'];
+        }
+        $order_options = [
+          'title_asc' => __('Title (A-Z)', 'rrze-knowledgebase'),
+          'title_desc' => __('Title (Z-A)', 'rrze-knowledgebase'),
+          'date_asc' => __('Date (oldest first)', 'rrze-knowledgebase'),
+          'date_desc' => __('Date (newest first)', 'rrze-knowledgebase'),
+        ];
+        $order_selected = 'title_asc';
+        if (!empty($_GET['kb-order'])) {
+            $order_selected = in_array($_GET['kb-order'], array_keys($order_options) ? : []) ? $_GET['kb-order'] : 'title_asc';
+        }
 
+        // Search form
         $output = '<div class="rrze-kb-search">'
             . '<h2 class="rrze-kb-search-title">' . $search_title . '</h2>'
-            . '<form class="rrze-kb-search-form" method="get">
-					<input type="search" name="kb-search" class="" value="' . (isset($_GET['kb-search']) ? sanitize_text_field($_GET['kb-search']) : '') . '" aria-label="' . __('Search the knowledge base', 'rrze-knowledgebase') . '" placeholder="' . __('Search the knowledge base', 'rrze-knowledgebase') . '" />
-					<input type="hidden" name="post_type" value="rrze-kb-article" />
-					<input type="submit" value="' . __('Search', 'rrze-knowledgebase') . '" />
-				</form>';
+                  /* translators: %s: Knowledge Base name */
+            . '<form class="rrze-kb-search-form" method="get">'
+                  . '<div class="kb-search-input-wrapper">'
+                  . '<input type="search" name="kb-search" class="" value="' . (isset($_GET['kb-search']) ? sanitize_text_field($_GET['kb-search']) : '') . '" aria-label="' . sprintf(__('Search the %s', 'rrze-knowledgebase'), $kb_name) . '" placeholder="' . sprintf(__('Search the %s', 'rrze-knowledgebase'), $kb_name) . '" />'
+                  . '<button class="search-submit">' . __('Search', 'rrze-knowledgebase') . '</button>'
+                  . '<input type="hidden" name="post_type" value="rrze-kb-article" />'
+                  . '</div>'
+                  . self::render_checklist_section('kb-category', __('Category', 'rrze-knowledgebase'), $category_options, $category_selected)
+					. self::render_radiolist_section('kb-order', __('Order by', 'rrze-knowledgebase'), $order_options, $order_selected)
+				. '</form>';
 
-        if (!empty($_GET['kb-search'])) {
-            $articles = get_posts([
-                'post_type'      => 'rrze-kb-article',
-                'posts_per_page' => -1,
-                'orderby'        => 'title',
-                'order'          => 'ASC',
-                'no_found_rows'          => true,
-                'update_post_meta_cache' => false,
-                'update_post_term_cache' => false,
-                's' => sanitize_text_field($_GET['kb-search']),
-            ]);
-            if (!empty($articles)) {
-                $output .= '<h3>' . __('Search Results', 'rrze-knowledgebase') . '</h3>'
-                    . '<ul class="rrze-kb-articles">';
-                foreach ($articles as $article) {
-                    $output .= '<li class="rrze-kb-article"><a href="' . get_the_permalink($article->ID) . '"><span class="dashicons dashicons-media-document"></span>' . esc_html(get_the_title($article->ID)) . '</a></li>';
+        // Search results
+        if (!empty($_GET['kb-search']) || !empty($_GET['kb-category'])) {
+
+            $search = !empty($_GET['kb-search']) ? sanitize_text_field($_GET['kb-search']) : '';
+            $search_categories = !empty($_GET['kb-category']) ? array_map('absint', $_GET['kb-category']) : [];
+            $order = !empty($_GET['kb-order']) ? sanitize_text_field($_GET['kb-order']) : 'title_asc';
+            $search_results = self::get_articles($search, $search_categories, $order);
+
+            $output .= '<div class="rrze-kb-search-results"><h3>' . __('Search Results', 'rrze-knowledgebase') . '</h3>';
+
+            if ( empty($search_results)) {
+                $output .= '<p>' . __('No results found.', 'rrze-knowledgebase') . '</p>';
+            } else {
+                $articles_grouped = self::group_articles_by_category($search_results);
+
+                foreach ($articles_grouped as $group => $articles) {
+                    $output .= '<h4>'. $group . '</h4>'
+                        . '<ul>';
+                    foreach ($articles as $article) {
+                        $output .= '<li class="rrze-kb-article"><a href="' . get_the_permalink($article->ID) . '">'
+                                   . '<span class="dashicons dashicons-media-document"></span>'
+                                   . '<span class="link-text">' . esc_html(get_the_title($article->ID)) . '</span>'
+                                   . '</a></li>';
+                    }
+
+                    $output .= '</ul>';
                 }
-                $output .= '</ul>';
             }
+            $output .= '</div>';
+
         }
 
         $output .= '</div>';
 
         return $output;
+    }
+
+    private static function render_checklist_section(string $name, string $label, array $options, array $selected): string
+    {
+        $output = '<div class="filter-' . esc_attr($name) . '">';
+        $output .= '<button type="button" class="checklist-toggle">'
+                   . $label . '<span class="icon-wrapper" aria-hidden="true"></span></button>';
+        $output .= '<div class="checklist">';
+        foreach ($options as $id => $option) {
+            $checked = in_array($id, $selected);
+            $output .= '<label><input type="checkbox" name="' . esc_attr($name) . '[]" value="' . $id . '" '
+                       . checked($checked, true, false) . '>' . esc_html($option) . '</label>';
+        }
+        $output .= '<button type="submit" class="submit-filter" value="' . __('Apply filter', 'rrze-knowledgebase') . '">' . __('Apply filter', 'rrze-knowledgebase') . '</button>';
+        $output .= '</div>';
+        $output .= '</div>';
+        return $output;
+    }
+
+    private static function render_radiolist_section(string $name, string $label, array $options, string $selected): string
+    {
+        $output = '<div class="filter-' . esc_attr($name) . '">';
+        $output .= '<button type="button" class="checklist-toggle">'
+                   . $label . '<span class="icon-wrapper" aria-hidden="true"></span></button>';
+        $output .= '<div class="checklist">';
+        foreach ($options as $key => $value) {
+            $checked = $key == $selected;
+            $output .= '<label><input type="radio" name="' . esc_attr($name) . '" value="' . $key . '" '
+                       . checked($checked, true, false) . '>' . esc_html($value) . '</label>';
+        }
+        $output .= '<button type="submit" class="submit-filter">' . __('Apply filter', 'rrze-knowledgebase') . '</button>';
+        $output .= '</div>';
+        $output .= '</div>';
+        return $output;
+    }
+
+    private static function get_articles($search = '', $categories = [], $order = 'title_asc') {
+        $args = [
+            'post_type'              => 'rrze-kb-article',
+            'posts_per_page'         => -1,
+            'orderby'                => 'title',
+            'order'                  => 'ASC',
+            'no_found_rows'          => true,
+            'update_post_meta_cache' => false,
+            'update_post_term_cache' => false,
+        ];
+        if ( ! empty($search)) {
+            $args[ 's' ] = sanitize_text_field($search);
+        }
+        if ( ! empty($categories)) {
+            $args[ 'tax_query' ][] = [
+                'taxonomy'         => 'rrze-kb-category',
+                'field'            => 'term_id',
+                'terms'            => array_map('absint', $categories),
+                'operator'         => 'IN',
+                'include_children' => true,
+            ];
+        }
+        switch ($order) {
+            case 'title_asc':
+                $args[ 'orderby' ] = 'title';
+                $args[ 'order' ]   = 'ASC';
+                break;
+            case 'title_desc':
+                $args[ 'orderby' ] = 'title';
+                $args[ 'order' ]   = 'DESC';
+                break;
+            case 'date_asc':
+                $args[ 'orderby' ] = 'modified';
+                $args[ 'order' ]   = 'ASC';
+                break;
+            case 'date_desc':
+                $args[ 'orderby' ] = 'modified';
+                $args[ 'order' ]   = 'DESC';
+                break;
+        }
+        $articles = get_posts($args);
+
+        return $articles;
+    }
+
+    private static function group_articles_by_category($articles) {
+        $articles_grouped = [];
+        foreach ($articles as $article) {
+            $top_terms = self::get_top_terms($article->ID, 'rrze-kb-category');
+            if (empty($top_terms)) {
+                $articles_grouped[__('Uncategorized', 'rrze-knowledgebase')][] = $article;
+            } else {
+                foreach ($top_terms as $term) {
+                    $articles_grouped[ $term->name ][] = $article;
+                }
+            }
+        }
+        return $articles_grouped;
+    }
+
+    private static function get_top_terms($post_id, $taxonomy) {
+        $terms = get_the_terms($post_id, $taxonomy);
+
+        if (empty($terms) || is_wp_error($terms)) {
+            return [];
+        }
+
+        $top_terms = [];
+
+        foreach ($terms as $term) {
+            while ($term->parent != 0) {
+                $term = get_term($term->parent, $taxonomy);
+            }
+
+            $top_terms[$term->term_id] = $term;
+        }
+
+        return array_values($top_terms);
+    }
+
+    public static /**
+     * Gibt '#000000' oder '#FFFFFF' zurück – je nachdem,
+     * welche Farbe den höheren Kontrast zum angegebenen Hex-Farbwert hat.
+     *
+     * @param string $hex Hex-Farbwert, z.B. "#3498db" oder "3498db"
+     * @return string "#000000" oder "#FFFFFF"
+     */
+    function getContrastColor(string $hex): string
+    {
+        $hex = ltrim($hex, '#');
+
+        // Kurzschreibweise (#abc -> #aabbcc)
+        if (strlen($hex) === 3) {
+            $hex = preg_replace('/(.)/', '$1$1', $hex);
+        }
+
+        if (!preg_match('/^[0-9a-fA-F]{6}$/', $hex)) {
+            throw new \InvalidArgumentException('Ungültiger Hex-Farbwert.');
+        }
+
+        $r = hexdec(substr($hex, 0, 2)) / 255;
+        $g = hexdec(substr($hex, 2, 2)) / 255;
+        $b = hexdec(substr($hex, 4, 2)) / 255;
+
+        // sRGB -> lineare RGB-Werte
+        $convert = function ($c) {
+            return ($c <= 0.04045)
+                ? $c / 12.92
+                : pow(($c + 0.055) / 1.055, 2.4);
+        };
+
+        $r = $convert($r);
+        $g = $convert($g);
+        $b = $convert($b);
+
+        // Relative Luminanz nach WCAG
+        $luminance = 0.2126 * $r + 0.7152 * $g + 0.0722 * $b;
+
+        // Kontrastverhältnisse
+        $contrastWhite = (1.05) / ($luminance + 0.05);
+        $contrastBlack = ($luminance + 0.05) / 0.05;
+
+        return ($contrastWhite > $contrastBlack) ? '#FFFFFF' : '#000000';
     }
 
 }

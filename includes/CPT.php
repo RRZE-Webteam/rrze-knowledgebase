@@ -13,7 +13,7 @@ class CPT
         add_action('init', [$this, 'register_post_type'], 9);
         add_action('init', [$this, 'register_taxonomies'], 9);
         add_action('add_meta_boxes', [$this, 'add_meta_box'] );
-        add_action( 'save_post', [$this, 'save_postdata'] );
+        add_action('save_post_rrze-kb-article', [$this, 'save_postdata'] );
         add_filter('single_template', [$this, 'include_single_template']);
         add_filter('archive_template', [$this, 'include_archive_template']);
         add_action('pre_get_posts', [$this, 'modify_archive_query']);
@@ -158,24 +158,83 @@ class CPT
 
     public function add_meta_box() {
         add_meta_box(
-            'kb_article_views',
+            'rrze_kb_article_views',
             __('KB Article views', 'rrze-knowledgebase'),
             [$this, 'meta_box_html'],
             self::POST_TYPE,
             'side'
         );
+        add_meta_box(
+            'rrze_kb_dependencies',
+            __('Dependencies', 'rrze-knowledgebase'),
+            [$this, 'metabox_dependencies_callback'],
+            'rrze-kb-article',
+            'normal',
+        );
     }
 
     public function meta_box_html($post) {
-        $value = get_post_meta( $post->ID, 'kb_article_views', true );
+        $value = get_post_meta( $post->ID, 'rrze_kb_article_views', true );
         wp_nonce_field(
-            'kb_article_views_action',
-            'kb_article_views_nonce'
+            'rrze_kb_article_views_action',
+            'rrze_kb_article_views_nonce'
         );
         ?>
-        <label for="kb-article-views"><?php esc_html_e('Article views', 'rrze-knowledgebase'); ?></label>
-        <input id="kb-article-views" name="kb_article_views" type="number" value="<?php echo esc_html($value); ?>" min="0">
+        <label for="rrze-kb-article-views"><?php esc_html_e('Article views', 'rrze-knowledgebase'); ?></label>
+        <input id="rrze-kb-article-views" name="rrze_kb_article_views" type="number" value="<?php echo esc_html($value); ?>" min="0">
         <?php
+    }
+
+    public function metabox_dependencies_callback($post)
+    {
+        wp_nonce_field('rrze_kb_dependencies_save', 'rrze_kb_dependencies_nonce');
+
+        $links = get_post_meta($post->ID, '_rrze_kb_dependencies', true);
+
+        if (!is_array($links)) {
+            $links = [];
+        }
+
+        for ($i = 0; $i < 3; $i++) {
+            $text = $links[$i]['text'] ?? '';
+            $url  = $links[$i]['url'] ?? '';
+
+            ?>
+            <p>
+                <strong><?php printf(__('Entry %d', 'rrze-knowledgebase'), $i + 1); ?></strong>
+            </p>
+
+            <p>
+                <label for="rrze_kb_dependencies_<?php echo $i; ?>_text">
+                    <?php _e('Text', 'rrze-knowledgebase'); ?>
+                </label><br>
+                <input
+                    type="text"
+                    id="rrze_kb_dependencies_<?php echo $i; ?>_text"
+                    name="rrze_kb_dependencies[<?php echo $i; ?>][text]"
+                    value="<?php echo esc_attr($text); ?>"
+                    class="widefat"
+                >
+            </p>
+
+            <p>
+                <label for="rrze_kb_dependencies_<?php echo $i; ?>_url">
+                    <?php _e('URL', 'rrze-knowledgebase'); ?>
+                </label><br>
+                <input
+                    type="url"
+                    id="rrze_kb_dependencies_<?php echo $i; ?>_url"
+                    name="rrze_kb_dependencies[<?php echo $i; ?>][url]"
+                    value="<?php echo esc_url($url); ?>"
+                    class="widefat"
+                    placeholder="https://example.com"
+                >
+            </p>
+
+            <hr>
+
+            <?php
+        }
     }
 
     public function save_postdata( $post_id ) {
@@ -188,12 +247,12 @@ class CPT
             return;
         }
 
-        if ( ! isset( $_POST['kb_article_views'] ) ) {
+        if ( ! isset( $_POST['rrze_kb_article_views'] ) ) {
             return;
         }
 
-        if ( ! isset( $_POST['kb_article_views_nonce'] )
-             || ! wp_verify_nonce(sanitize_text_field( wp_unslash($_POST['kb_article_views_nonce']), 'kb_article_views_action' ))) {
+        if ( ! isset( $_POST['rrze_kb_article_views_nonce'] )
+             || ! wp_verify_nonce(sanitize_text_field( wp_unslash($_POST['rrze_kb_article_views_nonce']), 'kb_article_views_action' ))) {
             return;
         }
 
@@ -201,11 +260,11 @@ class CPT
             return;
         }
 
-        $views = absint( $_POST['kb_article_views'] );
+        $views = absint( $_POST['rrze_kb_article_views'] );
 
         update_post_meta(
             $post_id,
-            'kb_article_views',
+            'rrze_kb_article_views',
             $views
         );
     }
@@ -253,6 +312,8 @@ class CPT
 
         $term = get_queried_object();
 
+        $query->set('orderby', 'post_title');
+        $query->set('order', 'ASC');
         $query->set('tax_query', [
             [
                 'taxonomy'         => 'rrze-kb-category',

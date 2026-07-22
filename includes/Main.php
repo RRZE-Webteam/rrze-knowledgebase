@@ -28,7 +28,8 @@ class Main
         );
         $options = (new Settings)->get_options();
         $default_color = $options['accent-color'];
-        $css = ':root {--rrze-kb-accent-color: ' . $default_color . ';';
+        $contrast_color = Helper::getContrastColor($default_color);
+        $css = ':root {--rrze-kb-accent-color: ' . $default_color . '; --rrze-kb-contrast-color: ' . $contrast_color . '; }';
         // ToDo: Kontrastfarbe
         wp_add_inline_style('rrze-knowledgebase-style', $css);
 
