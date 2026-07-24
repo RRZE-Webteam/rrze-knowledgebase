@@ -51,7 +51,7 @@ class Output
             . Helper::make_breadcrumbs($this->category)
             . '<div class="rrze-kb-category-inner">';
 
-        $output .= '<div class="entry-content"><h1>' . $title . '</h1>';
+        $output .= '<div class="entry-content"><h1 class="entry-title">' . $title . '</h1>';
 
         if (is_post_type_archive()) {
             $output .= Helper::render_search();
@@ -87,6 +87,8 @@ class Output
             $output .= '<p class="nothing-found">' . __('No articles found.', 'rrze-knowledgebase') . '</p>';
         endif;
 
+        $output .= self::render_recent_articles(10, $this->category ? $this->category->term_id : null);
+
         $output .= '</div>';
 
         // Context Menu
@@ -120,17 +122,25 @@ class Output
         }
         // Article
         $output .= '<article class="entry-content">'
-                      . '<header class="entry-header"><h1 class="entry-title">' . get_the_title() . '</h1>'
-                       /* translators: %s: Date + time */
-                       . '<p class="article-meta">' . sprintf(__('Last modified: %s', 'rrze-knowledgebase'), $last_modified) . '</p>';
+                      . '<header class="entry-header"><h1 class="entry-title">' . get_the_title() . '</h1>';
 
         $target_groups = get_the_terms($post->ID, 'rrze-kb-target-group');
         if (!empty($target_groups) && !is_wp_error($target_groups)) {
             $output .= '<div class="rrze-kb-target-groups">' . __('Target Groups', 'rrze-knowledgebase') . ': ' . '<ul class="kb-target-groups">';
             foreach ($target_groups as $target_group) {
                 $link = get_term_link($target_group);
+                $term_color = get_term_meta($target_group->term_id, 'term_color', true);
+                if (empty($term_color)) {
+                    $term_color = '#04316a';
+                }
+                $contrast_color = get_term_meta($target_group->term_id, 'term_contrast_color', true);
+                if (empty($contrast_color)) {
+                    $contrast_color = Helper::getContrastColor($term_color);
+                }
                 if (!is_wp_error($link)) {
-                    $output .= '<li><a href="' . esc_url($link) . '">' . esc_html($target_group->name) . '</a></li>';
+                    $output .= '<li><a href="' . esc_url($link) . '" style="background-color: ' . sanitize_hex_color($term_color) . '; color: ' . sanitize_hex_color($contrast_color) . ';">'
+                               . esc_html($target_group->name)
+                               . '</a></li>';
                 } else {
                     $output .= '<li>' . esc_html($target_group->name) . '</li>';
                 }
@@ -140,13 +150,27 @@ class Output
         $output .= '</header>'
                       . $content;
 
+        $dependencies = get_post_meta($post->ID, 'rrze_kb_dependencies', true);
+        if (!empty($dependencies)) {
+            $output .= '<div class="rrze-kb-dependencies">'
+                . '<h2>' . __('Dependencies', 'rrze-knowledgebase') . '</h2>'
+                . '<ul class="wp-block-list">';
+            foreach ($dependencies as $dependency) {
+                $output .= '<li><a href="' . esc_url($dependency['url']) . '">' . esc_html($dependency['text']) . '</a></li>';
+            }
+
+            $output .= '</ul></div>';
+        }
+
+        $output .= '<footer class="entry-footer">';
         $tags = get_the_terms($post->ID, 'rrze-kb-tag');
         if (!empty($tags)) {
             $names = wp_list_pluck($tags, 'name');
-            $output .= '<footer class="entry-footer">'
-                . '<div class="rrze-kb-tags">' . __('Tags', 'rrze-knowledgebase') . ': ' . implode(', ', $names) . '</div>'
-                . '<footer class="entry-footer"></footer>';
+            $output .= '<div class="rrze-kb-tags">' . __('Tags', 'rrze-knowledgebase') . ': ' . implode(', ', $names) . '</div>';
         }
+        /* translators: %s: Date + time */
+        $output .= '<div class="last-modified">' . sprintf(__('Last modified: %s', 'rrze-knowledgebase'), $last_modified) . '</div>';
+        $output .= '</footer>';
 
         $output .= '</article>';
 
@@ -257,6 +281,42 @@ class Output
         endforeach;
 
         $output .= '</div>';
+
+        return $output;
+    }
+
+    public function render_recent_articles($number = 3, $category = null, ) {
+
+        $args = [
+            'post_type' => 'rrze-kb-article',
+            'posts_per_page' => (int) $number,
+            'orderby' => 'date',
+            'order' => 'DESC',
+        ];
+        if ( ! is_null($category)) {
+            $args['tax_query'] = [[
+               'taxonomy' => 'rrze-kb-category',
+               'field' => 'term_id',
+               'terms' => $category,
+                'include_children' => true,
+            ]];
+        }
+        $recent_articles = get_posts($args);
+        $output = '';
+        if ( ! empty($recent_articles)) :
+            $output .= '<div class="kb-recent-articles">';
+            $output .= '<h2>' . __('Recent Articles', 'rrze-knowledgebase') . '</h2>';
+            foreach ($recent_articles as $article) :
+                $output .= '<article class="kb-recent-article">'
+                           . '<h3><a href="' . esc_url(get_permalink($article->ID)) . '">'
+                           . esc_html($article->post_title) . '</a></h3>';
+                if ($article->post_excerpt) :
+                    $output .= '<p>' . esc_html($article->post_excerpt) . '</p>';
+                endif;
+                $output .= '</article>';
+           endforeach;
+           $output .= '</div>';
+        endif;
 
         return $output;
     }

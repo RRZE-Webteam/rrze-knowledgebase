@@ -27,10 +27,9 @@ class Main
             plugin()->getVersion(true)
         );
         $options = (new Settings)->get_options();
-        $default_color = $options['accent-color'];
-        $contrast_color = Helper::getContrastColor($default_color);
-        $css = ':root {--rrze-kb-accent-color: ' . $default_color . '; --rrze-kb-contrast-color: ' . $contrast_color . '; }';
-        // ToDo: Kontrastfarbe
+        $accent_color = $options['accent-color'];
+        $contrast_color = Helper::getContrastColor($accent_color);
+        $css = ':root {--rrze-kb-accent-color: ' . $accent_color . '; --rrze-kb-contrast-color: ' . $contrast_color . '; }';
         wp_add_inline_style('rrze-knowledgebase-style', $css);
 
         wp_register_script(
@@ -48,12 +47,37 @@ class Main
 
     public function admin_enqueue_scripts()
     {
-        /*wp_enqueue_style(
+        wp_enqueue_style(
             'rrze-knowledgebase-admin-style',
             plugins_url('assets/css/rrze-knowledgebase-admin.css', plugin()->getBasename()),
             [],
             plugin()->getVersion(true)
-        );*/
+        );
+
+        $screen = get_current_screen();
+        if (
+            isset($screen->taxonomy) &&
+            $screen->taxonomy === 'rrze-kb-target-group'
+        ) {
+            wp_enqueue_style('wp-color-picker');
+            wp_enqueue_script('wp-color-picker');
+
+            wp_add_inline_script(
+                'wp-color-picker',
+                'jQuery(function($){ $(".color-picker").wpColorPicker({
+                    palettes: [
+                        "#04316a",
+                        "#c50f3c",
+                        "#18b4f1",
+                        "#7bb725",
+                        "#fdb735",
+                        "#8c9fb1"
+                        ]
+                    });
+                });'
+            );
+        }
+
         /*wp_enqueue_script(
             'rrze-knowledgebase-admin-script',
             plugins_url('assets/js/rrze-knowledgebase-admin.js', plugin()->getBasename()),

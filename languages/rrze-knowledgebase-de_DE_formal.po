@@ -11,7 +11,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "POT-Creation-Date: 2026-07-21 10:18+0000\n"
-"PO-Revision-Date: 2026-07-22 10:07+0000\n"
+"PO-Revision-Date: 2026-07-23 08:31+0000\n"
 "X-Generator: Loco https://localise.biz/\n"
 "X-Domain: rrze-knowledgebase\n"
 "Language: de_DE_formal\n"
@@ -55,7 +55,7 @@ msgstr "Alle KB-Artikel"
 msgid "Apply filter"
 msgstr "Filter anwenden"
 
-#: includes/CPT.php:176
+#: includes/CPT.php:183
 msgid "Article views"
 msgstr "Artikel-Ansichten"
 
@@ -75,9 +75,17 @@ msgstr "Datum (neueste zuerst)"
 msgid "Date (oldest first)"
 msgstr "Datum (älteste zuerst)"
 
+#: includes/CPT.php:169
+msgid "Dependencies"
+msgstr "Abhängigkeiten"
+
 #: includes/CPT.php:33
 msgid "Edit KB Article"
 msgstr "KB-Artikel bearbeiten"
+
+#: includes/CPT.php:206
+msgid "Entry %d"
+msgstr "Eintrag %d"
 
 #: includes/Settings.php:144
 msgid "Grid"
@@ -225,7 +233,7 @@ msgstr "Titel der Suche"
 msgid "Set KB article image"
 msgstr "KB-Artikelbild setzen"
 
-#: includes/Output.php:94 includes/Output.php:156
+#: includes/Output.php:94 includes/Output.php:155
 msgid "Side Menu"
 msgstr "Seitenmenü"
 
@@ -233,7 +241,7 @@ msgstr "Seitenmenü"
 msgid "Slug"
 msgstr "Slug"
 
-#: includes/Output.php:171
+#: includes/Output.php:170
 msgid "Subcategories"
 msgstr "Unterkategorien"
 
@@ -245,11 +253,11 @@ msgstr "Tabelle"
 msgid "Table of contents"
 msgstr "Inhaltsverzeichnis"
 
-#: includes/Output.php:136
+#: includes/Output.php:147
 msgid "Tags"
 msgstr "Schlagwörter"
 
-#: includes/Output.php:139
+#: includes/Output.php:129
 msgid "Target Groups"
 msgstr "Zielgruppen"
 
@@ -328,6 +336,10 @@ msgctxt "Taxonomy singular name"
 msgid "KB Target Group"
 msgstr "KB-Zielgruppe"
 
+#: includes/CPT.php:211
+msgid "Text"
+msgstr "Text"
+
 #. 1: Server PHP version number, 2: Required PHP version number.
 #: rrze-knowledgebase.php:63
 #, php-format
@@ -363,6 +375,10 @@ msgstr "Ohne Kategorie"
 #: includes/CPT.php:45
 msgid "Uploaded to this KB article"
 msgstr "Zu diesem KB-Artikel hochgeladen"
+
+#: includes/CPT.php:224
+msgid "URL"
+msgstr "URL"
 
 #: includes/CPT.php:43
 msgid "Use as KB article image"

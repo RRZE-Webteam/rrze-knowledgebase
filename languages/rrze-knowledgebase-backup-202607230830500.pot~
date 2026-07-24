@@ -1,333 +1,331 @@
 # Copyright (C) 2026 RRZE Webteam
 # This file is distributed under the GNU General Public License v3.0.
+#, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: RRZE Knowledge Base 1.0.0\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/rrze-"
 "knowledgebase\n"
-"Last-Translator: \n"
-"Language-Team: Deutsch (Sie)\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-07-21 10:18+0000\n"
-"PO-Revision-Date: 2026-07-21 12:47+0000\n"
+"POT-Creation-Date: 2026-07-22 10:07+0000\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: Loco https://localise.biz/\n"
 "X-Domain: rrze-knowledgebase\n"
-"Language: de_DE_formal\n"
-"Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Loco-Version: 2.8.7; wp-7.0.1; php-8.3.30"
+"Language: \n"
+"Plural-Forms: nplurals=INTEGER; plural=EXPRESSION;"
 
 #. %s: Knowledge Base name
 #: includes/Helper.php:60
 #, php-format
 msgid "%s Breadcrumb Navigation"
-msgstr "%s Navigationspfad"
+msgstr ""
 
 #: includes/Settings.php:165
 msgid "Accent Color"
-msgstr "Akzent-Farbe"
+msgstr ""
 
 #: includes/CPT.php:31
 msgid "Add New KB Article"
-msgstr "Neuen KB-Artikel erstellen"
+msgstr ""
 
 #: includes/CPT.php:29
 msgctxt "add new on admin bar"
 msgid "KB Articles"
-msgstr "KB-Artikel"
+msgstr ""
 
 #: includes/CPT.php:30
 msgctxt "admin menu"
 msgid "Add New"
-msgstr "Erstellen"
+msgstr ""
 
 #: includes/CPT.php:28
 msgctxt "admin menu"
 msgid "Knowledge Base"
-msgstr "Wissensdatenbank"
+msgstr ""
 
 #: includes/CPT.php:35
 msgid "All KB Articles"
-msgstr "Alle KB-Artikel"
+msgstr ""
+
+#: includes/Helper.php:405 includes/Helper.php:422
+msgid "Apply filter"
+msgstr ""
 
 #: includes/CPT.php:176
 msgid "Article views"
-msgstr "Artikel-Ansichten"
+msgstr ""
 
 #: includes/Output.php:62
 msgid "Articles"
-msgstr "Artikel"
+msgstr ""
 
-#: includes/Helper.php:348
-msgid "Ascending"
-msgstr "Aufsteigend"
-
-#: includes/Helper.php:338
+#: includes/Helper.php:353
 msgid "Category"
-msgstr "Kategorie"
+msgstr ""
 
-#: includes/Helper.php:344
-msgid "Date"
-msgstr "Datum"
+#: includes/Helper.php:336
+msgid "Date (newest first)"
+msgstr ""
 
-#: includes/Helper.php:349
-msgid "Descending"
-msgstr "Absteigend"
+#: includes/Helper.php:335
+msgid "Date (oldest first)"
+msgstr ""
 
 #: includes/CPT.php:33
 msgid "Edit KB Article"
-msgstr "KB-Artikel bearbeiten"
+msgstr ""
 
 #: includes/Settings.php:144
 msgid "Grid"
-msgstr "Kacheln"
+msgstr ""
 
 #. URI of the plugin
 msgid "https://github.com/RRZE-Webteam/rrze-knowledgebase"
-msgstr "https://github.com/RRZE-Webteam/rrze-knowledgebase"
+msgstr ""
 
 #. Author URI of the plugin
 msgid "https://www.wp.rrze.fau.de/"
-msgstr "https://www.wp.rrze.fau.de/"
+msgstr ""
 
 #: includes/CPT.php:44
 msgid "Insert into KB article"
-msgstr "In den KB-Artikel einfügen"
+msgstr ""
 
 #: includes/CPT.php:40
 msgid "KB Article image"
-msgstr "KB-Artikelbild"
+msgstr ""
 
 #: includes/CPT.php:162
 msgid "KB Article views"
-msgstr "KB-Artikel-Ansichten"
+msgstr ""
 
 #: includes/Settings.php:13 includes/Helper.php:57 includes/Helper.php:315
 msgid "Knowledge Base"
-msgstr "Wissensdatenbank"
+msgstr ""
 
 #: includes/Settings.php:14
 msgid "knowledgebase"
-msgstr "wissensdatenbank"
+msgstr ""
+
+#. %s: Date + time
+#: includes/Output.php:125
+#, php-format
+msgid "Last modified: %s"
+msgstr ""
 
 #: includes/Settings.php:139
 msgid "Layout"
-msgstr "Layout"
+msgstr ""
 
 #: includes/Settings.php:145
 msgid "List"
-msgstr "Liste"
+msgstr ""
 
 #: includes/Settings.php:93
 msgid "Name"
-msgstr "Name"
+msgstr ""
 
 #: includes/CPT.php:32
 msgid "New KB Article"
-msgstr "Neuer KB-Artikel"
+msgstr ""
 
 #: includes/Output.php:87
 msgid "No articles found."
-msgstr "Keine Artikel gefunden."
+msgstr ""
 
 #: includes/CPT.php:39
 msgid "No KB articles found in Trash."
-msgstr "Keine KB-Artikel im Papierkorb gefunden."
+msgstr ""
 
 #: includes/CPT.php:38
 msgid "No KB articles found."
-msgstr "Keine KB-Artikel gefunden."
+msgstr ""
 
-#: includes/Helper.php:363
+#: includes/Helper.php:368
 msgid "No results found."
-msgstr "Keine Ergebnisse gefunden."
+msgstr ""
 
-#: includes/Helper.php:347
-msgid "Order"
-msgstr "Reihenfolge"
-
-#: includes/Helper.php:342
+#: includes/Helper.php:354
 msgid "Order by"
-msgstr "Sortieren nach"
+msgstr ""
 
 #: includes/CPT.php:37
 msgid "Parent KB Articles:"
-msgstr "Übergeordneter KB-Artikel:"
+msgstr ""
 
 #. Description of the plugin
 msgid "Plugin for adding knowledgebase articles to a WordPress website"
-msgstr "WordPress-Plugin zur Erstellung einer Wissensdatenbank"
+msgstr ""
 
 #. 1: The plugin name, 2: The error string.
 #: rrze-knowledgebase.php:89 rrze-knowledgebase.php:146
 #, php-format
 msgid "Plugins: %1$s: %2$s"
-msgstr "Plugins: %1$s: %2$s"
+msgstr ""
 
 #: includes/CPT.php:26
 msgctxt "post type general name"
 msgid "KB Articles"
-msgstr "KB-Artikel"
+msgstr ""
 
 #: includes/CPT.php:27
 msgctxt "post type singular name"
 msgid "KB Article"
-msgstr "KB-Artikel"
+msgstr ""
 
 #: includes/CPT.php:42
 msgid "Remove KB article image"
-msgstr "KB-Artikelbild entfernen"
+msgstr ""
 
 #: rrze-knowledgebase.php:189
 msgid "RRZE"
-msgstr "RRZE"
+msgstr ""
 
 #. Name of the plugin
 #: includes/Settings.php:44
 msgid "RRZE Knowledge Base"
-msgstr "RRZE Knowledge Base"
+msgstr ""
 
 #: includes/Settings.php:43 includes/Settings.php:69
 msgid "RRZE Knowledge Base Settings"
-msgstr "RRZE Knowledge Base Einstellungen"
+msgstr ""
 
 #. Author of the plugin
 msgid "RRZE Webteam"
-msgstr "RRZE-Webteam"
+msgstr ""
 
-#: includes/Helper.php:339
+#: includes/Helper.php:350
 msgid "Search"
-msgstr "Suchen"
+msgstr ""
 
 #: includes/CPT.php:36
 msgid "Search KB Articles"
-msgstr "KB-Artikel durchsuchen"
+msgstr ""
 
-#: includes/Helper.php:360
+#: includes/Helper.php:365
 msgid "Search Results"
-msgstr "Suchergebnisse"
-
-#: includes/Helper.php:336
-#, php-format
-msgid "Search the %s"
-msgstr "%s durchsuchen"
+msgstr ""
 
 #. %s: Knowledge Base name
-#: includes/Helper.php:336
-msgid "Search the knowledge base"
-msgstr "Wissensdatenbank durchsuchen"
+#: includes/Helper.php:349
+#, php-format
+msgid "Search the %s"
+msgstr ""
 
 #: includes/Settings.php:122
 msgid "Search Title"
-msgstr "Titel der Suche"
+msgstr ""
 
 #: includes/CPT.php:41
 msgid "Set KB article image"
-msgstr "KB-Artikelbild setzen"
+msgstr ""
 
-#: includes/Output.php:94 includes/Output.php:151
+#: includes/Output.php:94 includes/Output.php:156
 msgid "Side Menu"
-msgstr "Seitenmenü"
+msgstr ""
 
 #: includes/Settings.php:107
 msgid "Slug"
-msgstr "Slug"
+msgstr ""
 
-#: includes/Output.php:166
+#: includes/Output.php:171
 msgid "Subcategories"
-msgstr "Unterkategorien"
+msgstr ""
 
 #: includes/Settings.php:143
 msgid "Table"
-msgstr "Tabelle"
+msgstr ""
 
-#: includes/Output.php:117
+#: includes/Output.php:119
 msgid "Table of contents"
-msgstr "Inhaltsverzeichnis"
+msgstr ""
 
-#: includes/Output.php:131
+#: includes/Output.php:136
 msgid "Tags"
-msgstr "Schlagwörter"
+msgstr ""
 
-#: includes/Output.php:134
+#: includes/Output.php:139
 msgid "Target Groups"
-msgstr "Zielgruppen"
+msgstr ""
 
 #: includes/CPT.php:76
 msgctxt "Taxonomy general name"
 msgid "KB Categories"
-msgstr "KB-Kategorien"
+msgstr ""
 
 #: includes/CPT.php:104
 msgctxt "Taxonomy general name"
 msgid "KB Tags"
-msgstr "KB-Schlagwörter"
+msgstr ""
 
 #: includes/CPT.php:132
 msgctxt "Taxonomy general name"
 msgid "KB Target Groups"
-msgstr "KB-Zielgruppen"
+msgstr ""
 
 #: includes/CPT.php:78
 msgctxt "Taxonomy plural name"
 msgid "KB Categories"
-msgstr "KB-Kategorien"
+msgstr ""
 
 #: includes/CPT.php:106
 msgctxt "Taxonomy plural name"
 msgid "KB Tags"
-msgstr "KB-Schlagwörter"
+msgstr ""
 
 #: includes/CPT.php:134
 msgctxt "Taxonomy plural name"
 msgid "KB Target Groups"
-msgstr "KB-Zielgruppen"
+msgstr ""
 
 #: includes/CPT.php:80
 msgctxt "Taxonomy singular name"
 msgid "Add New KB Category"
-msgstr "Neuen KB-Kategorie erstellen"
+msgstr ""
 
 #: includes/CPT.php:108
 msgctxt "Taxonomy singular name"
 msgid "Add New KB Tag"
-msgstr "Neues KB-Schlagwort erstellen"
+msgstr ""
 
 #: includes/CPT.php:136
 msgctxt "Taxonomy singular name"
 msgid "Add New KB Target Group"
-msgstr "Neue KB-Zielgruppe erstellen"
+msgstr ""
 
 #: includes/CPT.php:79
 msgctxt "Taxonomy singular name"
 msgid "Edit KB Category"
-msgstr "KB-Kategorie bearbeiten"
+msgstr ""
 
 #: includes/CPT.php:107
 msgctxt "Taxonomy singular name"
 msgid "Edit KB Tag"
-msgstr "KB-Schlagwort bearbeiten"
+msgstr ""
 
 #: includes/CPT.php:77
 msgctxt "Taxonomy singular name"
 msgid "KB Category"
-msgstr "KB-Kategorie"
+msgstr ""
 
 #: includes/CPT.php:135
 msgctxt "Taxonomy singular name"
 msgid "KB Edit Target Group"
-msgstr "KB-Zielgruppe bearbeiten"
+msgstr ""
 
 #: includes/CPT.php:105
 msgctxt "Taxonomy singular name"
 msgid "KB Tag"
-msgstr "KB-Schlagwort"
+msgstr ""
 
 #: includes/CPT.php:133
 msgctxt "Taxonomy singular name"
 msgid "KB Target Group"
-msgstr "KB-Zielgruppe"
+msgstr ""
 
 #. 1: Server PHP version number, 2: Required PHP version number.
 #: rrze-knowledgebase.php:63
@@ -336,8 +334,6 @@ msgid ""
 "The server is running PHP version %1$s. The Plugin requires at least PHP "
 "version %2$s."
 msgstr ""
-"Auf dem Server läuft PHP Version %1$s. Das Plugin erfordert mindestens PHP "
-"Version %2$s."
 
 #. 1: Server WordPress version number, 2: Required WordPress version number.
 #: rrze-knowledgebase.php:70
@@ -346,29 +342,31 @@ msgid ""
 "The server is running WordPress version %1$s. The Plugin requires at least "
 "WordPress version %2$s."
 msgstr ""
-"Auf dem Server läuft WordPress Version %1$s. Das Plugin erfordert mindestens "
-"WordPress Version %2$s."
 
-#: includes/Helper.php:343
-msgid "Title"
-msgstr "Titel"
+#: includes/Helper.php:333
+msgid "Title (A-Z)"
+msgstr ""
 
-#: includes/Helper.php:438
+#: includes/Helper.php:334
+msgid "Title (Z-A)"
+msgstr ""
+
+#: includes/Helper.php:478
 msgid "Uncategorized"
-msgstr "Ohne Kategorie"
+msgstr ""
 
 #: includes/CPT.php:45
 msgid "Uploaded to this KB article"
-msgstr "Zu diesem KB-Artikel hochgeladen"
+msgstr ""
 
 #: includes/CPT.php:43
 msgid "Use as KB article image"
-msgstr "Als KB-Artikelbild verwenden"
+msgstr ""
 
 #: includes/CPT.php:34
 msgid "View KB Article"
-msgstr "KB-Artikel ansehen"
+msgstr ""
 
 #: includes/Settings.php:15
 msgid "What are you looking for?"
-msgstr "Was Suchen Sie?"
+msgstr ""

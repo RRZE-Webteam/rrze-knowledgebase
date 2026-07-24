@@ -1,0 +1,26 @@
+#rrze_kb_dependencies {
+    .meta-label {
+
+    }
+    .rrze-kb-dependency-item {
+        margin-bottom: 10px;
+        @media (min-width: 600px) {
+            display: flex;
+            align-items: center;
+            flex-direction: row;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+        .meta-label {
+            @media (min-width: 600px) {
+                flex: 1 0 0;
+                font-weight: 500;
+            }
+        }
+        .meta-input {
+            @media (min-width: 600px) {
+                flex: 5;
+            }
+        }
+    }
+}

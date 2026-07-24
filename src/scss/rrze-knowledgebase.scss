@@ -172,31 +172,55 @@
 .rrze-kb-article-page {
     container-name: kb-page-container;
     container-type: inline-size;
-    .article-meta {
+    .last-modified {
         font-size: smaller;
-        color: color-mix(in oklch, currentColor 40%, white);
+        //color: color-mix(in oklch, currentColor 50%, white);
     }
-    ul.kb-target-groups {
-        display: inline-block;
-        list-style: none;
-        padding: 0;
-        margin: 0;
-        li {
+    .rrze-kb-tags {
+        margin-bottom: .5em;
+    }
+    .rrze-kb-target-groups {
+        color: color-mix(in oklch, currentColor 50%, white);
+        ul.kb-target-groups {
             display: inline-block;
-            margin-right: 1em;
-            a {
-                padding: 0 0.5em;
-                text-decoration: none;
-                background-color: var(--rrze-kb-accent-color, #04316a);
-                color: var(--rrze-kb-contrast-color, #fff);
-                &:hover, &:focus, &:active {
-                    background-color: color-mix(in oklch, var(--rrze-kb-accent-color, #04316a) 80%, black);
-                }
-            }
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            li {
+                display: inline-block;
+                margin-left: .5em;
 
+                a {
+                    padding: 0 0.5em;
+                    text-decoration: none;
+                    letter-spacing: 0.02em;
+                    /*background-color: var(--rrze-kb-accent-color, #04316a);
+                    color: var(--rrze-kb-contrast-color, #fff);
+
+                    &:hover, &:focus, &:active {
+                        background-color: color-mix(in oklch, var(--rrze-kb-accent-color, #04316a) 80%, black);
+                    }*/
+                }
+
+            }
         }
     }
     .rrze-kb-article-inner {
+        .entry-footer {
+            border-top: 1px solid #ccc;
+            padding-top: .5em;
+        }
+        .rrze-kb-dependencies {
+            padding: 1em;
+            margin: 1em 0;
+            background-color: #f8f8f8;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: smaller;
+            h2 {
+                margin-top: 0;
+            }
+        }
         .rrze-kb-toc-container {
             h2 {
                 margin: 0 0 .5em;

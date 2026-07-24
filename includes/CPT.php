@@ -18,6 +18,10 @@ class CPT
         add_filter('archive_template', [$this, 'include_archive_template']);
         add_action('pre_get_posts', [$this, 'modify_archive_query']);
         add_action('init', [$this, 'flush_rewrite'], 99);
+        add_action('rrze-kb-target-group_add_form_fields', [$this, 'target_group_meta_box_add_callback']);
+        add_action('rrze-kb-target-group_edit_form_fields', [$this, 'target_group_meta_box_edit_callback']);
+        add_action('created_rrze-kb-target-group', [$this, 'kb_target_group_save_color']);
+        add_action('edited_rrze-kb-target-group', [$this, 'kb_target_group_save_color']);
     }
 
     public function register_post_type()
@@ -189,7 +193,7 @@ class CPT
     {
         wp_nonce_field('rrze_kb_dependencies_save', 'rrze_kb_dependencies_nonce');
 
-        $links = get_post_meta($post->ID, '_rrze_kb_dependencies', true);
+        $links = get_post_meta($post->ID, 'rrze_kb_dependencies', true);
 
         if (!is_array($links)) {
             $links = [];
@@ -200,38 +204,40 @@ class CPT
             $url  = $links[$i]['url'] ?? '';
 
             ?>
-            <p>
-                <strong><?php printf(__('Entry %d', 'rrze-knowledgebase'), $i + 1); ?></strong>
-            </p>
+            <div class="rrze-kb-dependency-item">
 
-            <p>
-                <label for="rrze_kb_dependencies_<?php echo $i; ?>_text">
-                    <?php _e('Text', 'rrze-knowledgebase'); ?>
-                </label><br>
-                <input
-                    type="text"
-                    id="rrze_kb_dependencies_<?php echo $i; ?>_text"
-                    name="rrze_kb_dependencies[<?php echo $i; ?>][text]"
-                    value="<?php echo esc_attr($text); ?>"
-                    class="widefat"
-                >
-            </p>
+                <p class="meta-label">
+                    <?php printf(__('Entry %d', 'rrze-knowledgebase'), $i + 1); ?>
+                </p>
 
-            <p>
-                <label for="rrze_kb_dependencies_<?php echo $i; ?>_url">
-                    <?php _e('URL', 'rrze-knowledgebase'); ?>
-                </label><br>
-                <input
-                    type="url"
-                    id="rrze_kb_dependencies_<?php echo $i; ?>_url"
-                    name="rrze_kb_dependencies[<?php echo $i; ?>][url]"
-                    value="<?php echo esc_url($url); ?>"
-                    class="widefat"
-                    placeholder="https://example.com"
-                >
-            </p>
+                <div class="meta-input">
+                    <label for="rrze_kb_dependencies_<?php echo $i; ?>_text">
+                        <?php _e('Text', 'rrze-knowledgebase'); ?>
+                    </label><br>
+                    <input
+                        type="text"
+                        id="rrze_kb_dependencies_<?php echo $i; ?>_text"
+                        name="rrze_kb_dependencies[<?php echo $i; ?>][text]"
+                        value="<?php echo esc_attr($text); ?>"
+                        class="widefat"
+                    >
+                </div>
 
-            <hr>
+                <div class="meta-input">
+                    <label for="rrze_kb_dependencies_<?php echo $i; ?>_url">
+                        <?php _e('URL', 'rrze-knowledgebase'); ?>
+                    </label><br>
+                    <input
+                        type="url"
+                        id="rrze_kb_dependencies_<?php echo $i; ?>_url"
+                        name="rrze_kb_dependencies[<?php echo $i; ?>][url]"
+                        value="<?php echo esc_url($url); ?>"
+                        class="widefat"
+                        placeholder="https://example.com"
+                    >
+                </div>
+
+            </div>
 
             <?php
         }
@@ -239,24 +245,67 @@ class CPT
 
     public function save_postdata( $post_id ) {
 
-        if ( defined( 'DOING_AUTOSAVE' ) && DOING_AUTOSAVE ) {
+        if (defined('DOING_AUTOSAVE') && DOING_AUTOSAVE) {
             return;
         }
 
-        if ( wp_is_post_revision( $post_id ) ) {
+        if (wp_is_post_revision($post_id)) {
             return;
         }
 
+        if (!current_user_can('edit_post', $post_id)) {
+            return;
+        }
+
+        $this->save_dependencies($post_id);
+        $this->save_article_views($post_id);
+
+    }
+
+    private function save_dependencies($post_id) {
+        if (
+            !isset($_POST['rrze_kb_dependencies_nonce']) ||
+            !wp_verify_nonce($_POST['rrze_kb_dependencies_nonce'], 'rrze_kb_dependencies_save')
+        ) {
+            return;
+        }
+
+        $dependencies = [];
+
+        if (!empty($_POST['rrze_kb_dependencies']) && is_array($_POST['rrze_kb_dependencies'])) {
+
+            foreach ($_POST['rrze_kb_dependencies'] as $entry) {
+
+                $text = sanitize_text_field($entry['text'] ?? '');
+                $url  = esc_url_raw($entry['url'] ?? '');
+
+                if ($text !== '' || $url !== '') {
+                    $dependencies[] = [
+                        'text' => $text,
+                        'url'  => $url,
+                    ];
+                }
+
+                if (count($dependencies) >= 3) {
+                    break;
+                }
+            }
+        }
+
+        if (!empty($dependencies)) {
+            update_post_meta($post_id, 'rrze_kb_dependencies', $dependencies);
+        } else {
+            delete_post_meta($post_id, 'rrze_kb_dependencies');
+        }
+    }
+
+    private function save_article_views($post_id) {
         if ( ! isset( $_POST['rrze_kb_article_views'] ) ) {
             return;
         }
 
         if ( ! isset( $_POST['rrze_kb_article_views_nonce'] )
              || ! wp_verify_nonce(sanitize_text_field( wp_unslash($_POST['rrze_kb_article_views_nonce']), 'kb_article_views_action' ))) {
-            return;
-        }
-
-        if ( ! current_user_can( 'edit_post', $post_id ) ) {
             return;
         }
 
@@ -267,6 +316,49 @@ class CPT
             'rrze_kb_article_views',
             $views
         );
+    }
+
+    public function target_group_meta_box_add_callback() {
+        ?>
+        <div class="form-field term-color-wrap">
+            <label for="term-color">Farbe</label>
+            <input type="text" id="term-color" name="term_color" class="color-picker" value="#04316a">
+            <p>Wähle eine Farbe für diese Zielgruppe.</p>
+        </div>
+        <?php
+    }
+
+    public function target_group_meta_box_edit_callback($term) {
+        $color = get_term_meta($term->term_id, 'term_color', true);
+        $color = $color ?: '#04316a';
+        ?>
+        <tr class="form-field term-color-wrap">
+            <th scope="row">
+                <label for="term-color">Farbe</label>
+            </th>
+            <td>
+                <input type="text" id="term-color" name="term_color" class="color-picker" value="<?php echo esc_attr($color); ?>">
+                <p class="description">Wähle eine Farbe für diese Zielgruppe.</p>
+            </td>
+        </tr>
+        <?php
+    }
+
+    public function kb_target_group_save_color($term_id)
+    {
+        if (isset($_POST['term_color'])) {
+            update_term_meta(
+                $term_id,
+                'term_color',
+                sanitize_hex_color($_POST['term_color'])
+            );
+            $contrast_color = Helper::getContrastColor($_POST['term_color']);
+            update_term_meta(
+                $term_id,
+                'term_contrast_color',
+                sanitize_hex_color($contrast_color)
+            );
+        }
     }
 
     public static function include_archive_template($template_path)
