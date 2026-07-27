@@ -7,6 +7,10 @@ class Output
     private $category;
     private $subcategories;
 
+    private $has_target_groups = false;
+
+    private string $target_group = '';
+
     public function __construct($object)
     {
         if ( is_post_type_archive()) {
@@ -32,6 +36,21 @@ class Output
             $terms = get_the_terms( $object->ID, 'rrze-kb-category' );
             $this->category = $terms[0] ?? null;
         }
+
+        $target_group_ids = get_terms([
+            'taxonomy'   => 'rrze-kb-target-group',
+            'hide_empty' => false,
+            'fields'     => 'ids',
+            'number'     => 1,
+        ]);
+
+        if (!is_wp_error($target_group_ids) && !empty($target_group_ids)) {
+            $this->has_target_groups = true;
+        }
+
+        if (isset($_GET['target-group'])) {
+            $this->target_group = sanitize_title($_GET['target-group']);
+        }
     }
 
     public function render_archive()
@@ -54,38 +73,39 @@ class Output
         $output .= '<div class="entry-content"><h1 class="entry-title">' . $title . '</h1>';
 
         if (is_post_type_archive()) {
+            $output .= $this->has_target_groups ? Helper::render_target_group_dropdown() : '';
             $output .= Helper::render_search();
         }
 
-        if (!is_post_type_archive() && have_posts()) :
+        if ((is_tax('rrze-kb-category')|| is_tax('rrze-kb-target-group')) && !empty($this->category->description)) {
+            $output .= '<div class="kb-category-description">' . esc_html($this->category->description) . '</div>';
+        }
 
+        if ((is_tax('rrze-kb-category')|| is_tax('rrze-kb-target-group')) && have_posts()) {
             $output .= '<h2>' . __('Articles', 'rrze-knowledgebase') . '</h2><div class="kb-category-post-list"><ul>';
 
             while (have_posts()) : the_post();
 
-                $classes = get_post_class( '', get_the_ID() );
-                $output .= '<li class="' . esc_attr( implode( ' ', $classes ) ) . '">'
-                           . '<a href="' . get_the_permalink() . '">'
-                           . '<span class="dashicons dashicons-media-document"></span>'
-                           . '<span class="link-text">' . get_the_title() . '</span>'
-                           . '</a>'
-                           . '</li>';
+                $classes = get_post_class('', get_the_ID());
+                $output  .= '<li class="' . esc_attr(implode(' ', $classes)) . '">'
+                            . '<a href="' . get_the_permalink() . '">'
+                            . '<span class="dashicons dashicons-media-document"></span>'
+                            . '<span class="link-text">' . get_the_title() . '</span>'
+                            . '</a>'
+                            . '</li>';
 
             endwhile;
 
             $output .= '</ul></div>';
+        }
 
-        endif;
+        if ( ! empty($this->subcategories)) {
+            $output .= $this->render_subcategories($this->subcategories, $this->target_group);
+        }
 
-        if ( ! empty($this->subcategories)) :
-
-            $output .= $this->render_subcategories($this->subcategories);
-
-        endif;
-
-        if (empty($this->subcategories) && !have_posts()) :
+        if (empty($this->subcategories) && !have_posts()) {
             $output .= '<p class="nothing-found">' . __('No articles found.', 'rrze-knowledgebase') . '</p>';
-        endif;
+        }
 
         $output .= self::render_recent_articles(10, $this->category ? $this->category->term_id : null);
 
@@ -185,7 +205,7 @@ class Output
         return wp_kses_post($output);
     }
 
-    private function render_subcategories($subcategories): string
+    private function render_subcategories($subcategories, $target_group = ''): string
     {
 
         if (is_post_type_archive('rrze-kb-article')) {
@@ -205,21 +225,30 @@ class Output
                 $output .= '<p class="kb-category-description">' . esc_html($subcategory->description) . '</p>';
             endif;
 
-            $subarticles = get_posts([
-                                         'post_type'              => 'rrze-kb-article',
-                                         'posts_per_page'         => -1,
-                                         'no_found_rows'          => true,
-                                         'update_post_meta_cache' => false,
-                                         'update_post_term_cache' => false,
-                                         'tax_query'              => [
-                                             [
-                                                 'taxonomy'         => 'rrze-kb-category',
-                                                 'field'            => 'term_id',
-                                                 'terms'            => $subcategory->term_id,
-                                                 'include_children' => false,
-                                             ],
-                                         ],
-                                     ]);
+            $args = [
+                'post_type'              => 'rrze-kb-article',
+                'posts_per_page'         => -1,
+                'no_found_rows'          => true,
+                'update_post_meta_cache' => false,
+                'update_post_term_cache' => false,
+                'tax_query'              => [
+                    'relation' => 'AND',
+                    [
+                        'taxonomy'         => 'rrze-kb-category',
+                        'field'            => 'term_id',
+                        'terms'            => $subcategory->term_id,
+                        'include_children' => false,
+                    ],
+                ],
+            ];
+            if (!empty($target_group)) {
+                $args['tax_query'][] = [
+                    'taxonomy'         => 'rrze-kb-target-group',
+                    'field'            => 'slug',
+                    'terms'            => $target_group,
+                ];
+            }
+            $subarticles = get_posts($args);
 
             if ( ! empty($subarticles)) :
 
@@ -304,18 +333,19 @@ class Output
         $recent_articles = get_posts($args);
         $output = '';
         if ( ! empty($recent_articles)) :
-            $output .= '<div class="kb-recent-articles">';
-            $output .= '<h2>' . __('Recent Articles', 'rrze-knowledgebase') . '</h2>';
+            $output .= '<div class="rrze-kb-recent-articles">';
+            $output .= '<h2>' . __('Recent Articles', 'rrze-knowledgebase') . '</h2><ul>';
             foreach ($recent_articles as $article) :
-                $output .= '<article class="kb-recent-article">'
-                           . '<h3><a href="' . esc_url(get_permalink($article->ID)) . '">'
-                           . esc_html($article->post_title) . '</a></h3>';
+                $output .= '<li class="kb-recent-article">'
+                           . '<a href="' . esc_url(get_permalink($article->ID)) . '">'
+                           . '<span class="dashicons dashicons-media-document"></span>'
+                           . '<span class="link-text">' . esc_html($article->post_title) . '</span></a>';
                 if ($article->post_excerpt) :
                     $output .= '<p>' . esc_html($article->post_excerpt) . '</p>';
                 endif;
-                $output .= '</article>';
+                $output .= '</li>';
            endforeach;
-           $output .= '</div>';
+           $output .= '</ul></div>';
         endif;
 
         return $output;

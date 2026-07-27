@@ -123,6 +123,7 @@
         }
     }
     .rrze-kb-start-page {
+        padding-top: var(--width-gutter, 30px);
         .rrze-kb-search {
             .rrze-kb-search-form {
                 .kb-search-input-wrapper {
@@ -349,6 +350,24 @@
         .rrze-kb-category-inner {
             @container kb-category-container (width > 800px) {
                 padding-top: var(--width-gutter, 30px);
+            }
+        }
+    }
+    .rrze-kb-recent-articles {
+        ul {
+            li {
+                a {
+                    .link-text {
+                        text-decoration: underline;
+                        text-decoration-thickness: var(--Spacing-05x);
+                        text-underline-offset: var(--Spacing-1x);
+                    }
+                    &:hover, &:focus, &:active {
+                        .link-text {
+                            text-decoration-thickness: var(--Spacing-1x);
+                        }
+                    }
+                }
             }
         }
     }

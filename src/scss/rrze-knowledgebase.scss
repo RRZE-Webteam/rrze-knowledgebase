@@ -1,3 +1,6 @@
+// Mixins & Variables
+@import "abstracts";
+
 .rrze-knowledgebase,
 .rrze-kb-category-page,
 .rrze-kb-article-page,
@@ -428,6 +431,30 @@
                 .dashicons {
                     margin-right: .25em;
                     text-decoration: none;
+                }
+            }
+        }
+    }
+}
+
+.rrze-kb-recent-articles {
+    margin-top: 2em;
+    margin-bottom: 1em;
+    ul {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        li {
+            margin-bottom: .5em;
+            a {
+                text-decoration: none;
+                .dashicons {
+                    margin-right: .25em;
+                }
+                &:hover, &:focus, &:active {
+                    .link-text {
+                        text-decoration: underline;
+                    }
                 }
             }
         }

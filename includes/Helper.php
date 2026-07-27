@@ -339,7 +339,10 @@ class Helper
         if (!empty($_GET['kb-order'])) {
             $order_selected = in_array($_GET['kb-order'], array_keys($order_options) ? : []) ? $_GET['kb-order'] : 'title_asc';
         }
-
+        $target_group = '';
+        if (isset($_GET['target-group'])) {
+            $target_group = '<input type="hidden" name="target-group" value="' . sanitize_title($_GET['target-group']) . '">';
+        }
         // Search form
         $output = '<div class="rrze-kb-search">'
             . '<h2 class="rrze-kb-search-title">' . $search_title . '</h2>'
@@ -349,6 +352,7 @@ class Helper
                   . '<input type="search" name="kb-search" class="" value="' . (isset($_GET['kb-search']) ? sanitize_text_field($_GET['kb-search']) : '') . '" aria-label="' . sprintf(__('Search the %s', 'rrze-knowledgebase'), $kb_name) . '" placeholder="' . sprintf(__('Search the %s', 'rrze-knowledgebase'), $kb_name) . '" />'
                   . '<button class="search-submit">' . __('Search', 'rrze-knowledgebase') . '</button>'
                   . '<input type="hidden" name="post_type" value="rrze-kb-article" />'
+                  . $target_group
                   . '</div>'
                   . self::render_checklist_section('kb-category', __('Category', 'rrze-knowledgebase'), $category_options, $category_selected)
 					. self::render_radiolist_section('kb-order', __('Order by', 'rrze-knowledgebase'), $order_options, $order_selected)
@@ -548,6 +552,23 @@ class Helper
         $contrastBlack = ($luminance + 0.05) / 0.05;
 
         return ($contrastWhite > $contrastBlack) ? '#FFFFFF' : '#000000';
+    }
+
+    public static function render_target_group_dropdown($selected = null) {
+
+        $output = '<form method="get">';
+        $output .= wp_dropdown_categories([
+                'taxonomy'        => 'rrze-kb-target-group',
+                'depth'           => 1,
+                'name'            => 'target-group',
+                'show_option_all' => __('All target groups', 'rrze-knowledgebase'),
+                'hide_empty'      => true,
+                'value_field'     => 'slug',
+                'selected'        => isset($_GET['target-group']) ? sanitize_text_field(wp_unslash($_GET['target-group'])) : '',
+                'echo'            => false,
+            ]);
+        $output .= '<button type="submit">' . esc_html('Filter', 'rrze-knowledgebase') . '</button></form>';
+        return $output;
     }
 
 }

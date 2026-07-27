@@ -7,11 +7,16 @@ defined('ABSPATH') || exit;
 class CPT
 {
     const POST_TYPE = 'rrze-kb-article';
+    /**
+     * @var array|false|mixed|null
+     */
+    private array $options;
+    private string $cpt_slug;
 
     public function __construct()
     {
+        add_action('init', [$this, 'register_taxonomies'], 9); // Taxonomy must be registered before the post type for rewrite rules to work.
         add_action('init', [$this, 'register_post_type'], 9);
-        add_action('init', [$this, 'register_taxonomies'], 9);
         add_action('add_meta_boxes', [$this, 'add_meta_box'] );
         add_action('save_post_rrze-kb-article', [$this, 'save_postdata'] );
         add_filter('single_template', [$this, 'include_single_template']);
@@ -22,6 +27,9 @@ class CPT
         add_action('rrze-kb-target-group_edit_form_fields', [$this, 'target_group_meta_box_edit_callback']);
         add_action('created_rrze-kb-target-group', [$this, 'kb_target_group_save_color']);
         add_action('edited_rrze-kb-target-group', [$this, 'kb_target_group_save_color']);
+
+        $this->options = get_option('rrze-kb');
+        $this->cpt_slug    = $this->options[ 'slug' ] ?? 'knowledge-base';
     }
 
     public function register_post_type()
@@ -50,8 +58,6 @@ class CPT
 
         ];
 
-        $options = get_option('rrze-kb');
-        $slug    = $options[ 'slug' ] ?? 'knowledge-base';
         $args = [
             'labels'             => $labels,
             'hierarchical'       => false,
@@ -60,11 +66,11 @@ class CPT
             'supports'           => ['title', 'editor', 'revisions', 'author', 'excerpt', 'page-attributes', 'thumbnail'],
             'menu_icon'          => 'dashicons-lightbulb',
             'capability_type'    => 'page',
-            'has_archive' => sanitize_title($slug),
+            'has_archive' => sanitize_title($this->cpt_slug),
             'exclude_from_search' => false,
             'publicly_queryable' => true,
             'rewrite' => [
-                'slug' => sanitize_title($slug),
+                'slug' => sanitize_title($this->cpt_slug),
                 'with_front' => false,
             ],
             'show_in_rest'       => true,
@@ -89,6 +95,7 @@ class CPT
             'hierarchical'      => true,
             'show_admin_column' => true,
             'show_in_rest'      => true,
+            'query_var'         => 'rrze-kb-category',
             'capabilities'      => [
                 'manage_terms'  => 'manage_options',
                 'edit_terms'    => 'manage_options',
@@ -96,7 +103,7 @@ class CPT
                 'assign_terms'  => 'edit_pages'
             ],
             'rewrite'           => [
-                'slug' => 'kb-category',
+                'slug' => $this->cpt_slug . '/kb-category',
                 'with_front' => false,
                 'hierarchical' => true
             ],
@@ -104,7 +111,7 @@ class CPT
         register_taxonomy('rrze-kb-category', self::POST_TYPE, $args);
 
         // Tags
-        $labels = [
+        /*$labels = [
             'name'              => _x('KB Tags', 'Taxonomy general name', 'rrze-knowledgebase'),
             'singular_name'     => _x('KB Tag', 'Taxonomy singular name', 'rrze-knowledgebase'),
             'plural_name'     => _x('KB Tags', 'Taxonomy plural name', 'rrze-knowledgebase'),
@@ -129,7 +136,7 @@ class CPT
                 'hierarchical' => true
             ],
         ];
-        register_taxonomy('rrze-kb-tag', self::POST_TYPE, $args);
+        register_taxonomy('rrze-kb-tag', self::POST_TYPE, $args);*/
 
         // Target Groups
         $labels = [
@@ -366,7 +373,7 @@ class CPT
         $current_object = get_queried_object();
         if (isset($current_object->query_var) && $current_object->name != self::POST_TYPE)
             return $template_path;
-        if (isset($current_object->taxonomy) && !in_array($current_object->taxonomy, ['rrze-kb-category', 'rrze-kb-tag']))
+        if (isset($current_object->taxonomy) && !in_array($current_object->taxonomy, ['rrze-kb-category', 'rrze-kb-tag', 'rrze-kb-target-group']))
             return $template_path;
 
         if ($theme_file = locate_template(array('archive-kb-article.php'))) {
