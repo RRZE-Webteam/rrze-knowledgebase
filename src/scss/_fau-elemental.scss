@@ -1,3 +1,22 @@
+@mixin fau-elemental-icon-list() {
+    ul {
+        li {
+            a {
+                .link-text {
+                    text-decoration: underline;
+                    text-decoration-thickness: var(--Spacing-05x);
+                    text-underline-offset: var(--Spacing-1x);
+                }
+                &:hover, &:focus, &:active {
+                    .link-text {
+                        text-decoration-thickness: var(--Spacing-1x);
+                    }
+                }
+            }
+        }
+    }
+}
+
 .fau-elemental {
     .rrze-kb-article-page,
     .rrze-kb-category-page,
@@ -56,21 +75,7 @@
             .rrze-kb-toc-container {
                 .rrze-kb-toc {
                     font-size: unset;
-                    ul {
-                        margin-bottom: var(--width-gutter, 30px);
-                        ul {
-                            margin-bottom: var(--width-gutter-third, 10px);
-                            ul {
-                                margin-bottom: 0;
-                            }
-                        }
-                    }
-                    a {
-                        &:hover, &:focus, &:active {
-                            text-decoration-thickness: var(--Spacing-1x);
-                            text-underline-offset: var(--Spacing-1x);
-                        }
-                    }
+                    @include fau-elemental-icon-list();
                 }
             }
             .last-modified,
@@ -105,20 +110,7 @@
                     font-size: unset;
                     margin: 0 0 .5em;
                 }
-                ul.kb-articles,
-                ul.kb-subsubcategories {
-                    a {
-                        text-decoration: none;
-                        .link-text {
-                            text-decoration: underline;
-                            text-decoration-thickness: var(--Spacing-05x);
-                            text-underline-offset: var(--Spacing-1x);
-                        }
-                        &:focus, :hover, &:active {
-                            text-decoration-thickness: var(--Spacing-1x);
-                        }
-                    }
-                }
+                @include fau-elemental-icon-list();
             }
         }
     }
@@ -324,25 +316,7 @@
                 h4 {
                     margin-bottom: var(--Spacing-1x, 0.25rem);
                 }
-                ul {
-                    margin-top: 0;
-                    padding: 0;
-                    list-style: none;
-                    li {
-                        padding: var(--Spacing-1x) 0;
-                        a {
-                            text-decoration: none;
-                            .link-text {
-                                text-decoration: underline;
-                                text-decoration-thickness: var(--Spacing-05x);
-                                text-underline-offset: var(--Spacing-1x);
-                            }
-                            &:focus, :hover, &:active {
-                                text-decoration-thickness: var(--Spacing-1x);
-                            }
-                        }
-                    }
-                }
+                @include fau-elemental-icon-list();
             }
         }
     }
@@ -354,21 +328,6 @@
         }
     }
     .rrze-kb-recent-articles {
-        ul {
-            li {
-                a {
-                    .link-text {
-                        text-decoration: underline;
-                        text-decoration-thickness: var(--Spacing-05x);
-                        text-underline-offset: var(--Spacing-1x);
-                    }
-                    &:hover, &:focus, &:active {
-                        .link-text {
-                            text-decoration-thickness: var(--Spacing-1x);
-                        }
-                    }
-                }
-            }
-        }
+        @include fau-elemental-icon-list();
     }
 }

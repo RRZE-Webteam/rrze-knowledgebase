@@ -28,7 +28,7 @@ class Main
         );
         $options = (new Settings)->get_options();
         $accent_color = $options['accent-color'];
-        $contrast_color = Helper::getContrastColor($accent_color);
+        $contrast_color = Helper::get_contrast_color($accent_color);
         $css = ':root {--rrze-kb-accent-color: ' . $accent_color . '; --rrze-kb-contrast-color: ' . $contrast_color . '; }';
         wp_add_inline_style('rrze-knowledgebase-style', $css);
 

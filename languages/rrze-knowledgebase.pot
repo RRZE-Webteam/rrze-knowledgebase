@@ -11,7 +11,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-07-23 08:30+0000\n"
+"POT-Creation-Date: 2026-07-28 09:47+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: Loco https://localise.biz/\n"
 "X-Domain: rrze-knowledgebase\n"
@@ -28,42 +28,46 @@ msgstr ""
 msgid "Accent Color"
 msgstr ""
 
-#: includes/CPT.php:31
+#: includes/CPT.php:43
 msgid "Add New KB Article"
 msgstr ""
 
-#: includes/CPT.php:29
+#: includes/CPT.php:41
 msgctxt "add new on admin bar"
 msgid "KB Articles"
 msgstr ""
 
-#: includes/CPT.php:30
+#: includes/CPT.php:42
 msgctxt "admin menu"
 msgid "Add New"
 msgstr ""
 
-#: includes/CPT.php:28
+#: includes/CPT.php:40
 msgctxt "admin menu"
 msgid "Knowledge Base"
 msgstr ""
 
-#: includes/CPT.php:35
+#: includes/CPT.php:47
 msgid "All KB Articles"
 msgstr ""
 
-#: includes/Helper.php:405 includes/Helper.php:422
+#: includes/Helper.php:573
+msgid "All target groups"
+msgstr ""
+
+#: includes/Helper.php:410 includes/Helper.php:427
 msgid "Apply filter"
 msgstr ""
 
-#: includes/CPT.php:183
+#: includes/CPT.php:194
 msgid "Article views"
 msgstr ""
 
-#: includes/Output.php:62
+#: includes/Output.php:79
 msgid "Articles"
 msgstr ""
 
-#: includes/Helper.php:353
+#: includes/Helper.php:357
 msgid "Category"
 msgstr ""
 
@@ -75,15 +79,15 @@ msgstr ""
 msgid "Date (oldest first)"
 msgstr ""
 
-#: includes/CPT.php:169
+#: includes/CPT.php:180 includes/Output.php:170
 msgid "Dependencies"
 msgstr ""
 
-#: includes/CPT.php:33
+#: includes/CPT.php:45
 msgid "Edit KB Article"
 msgstr ""
 
-#: includes/CPT.php:206
+#: includes/CPT.php:217
 msgid "Entry %d"
 msgstr ""
 
@@ -99,15 +103,15 @@ msgstr ""
 msgid "https://www.wp.rrze.fau.de/"
 msgstr ""
 
-#: includes/CPT.php:44
+#: includes/CPT.php:56
 msgid "Insert into KB article"
 msgstr ""
 
-#: includes/CPT.php:40
+#: includes/CPT.php:52
 msgid "KB Article image"
 msgstr ""
 
-#: includes/CPT.php:162
+#: includes/CPT.php:173
 msgid "KB Article views"
 msgstr ""
 
@@ -120,7 +124,7 @@ msgid "knowledgebase"
 msgstr ""
 
 #. %s: Date + time
-#: includes/Output.php:125
+#: includes/Output.php:186
 #, php-format
 msgid "Last modified: %s"
 msgstr ""
@@ -137,31 +141,31 @@ msgstr ""
 msgid "Name"
 msgstr ""
 
-#: includes/CPT.php:32
+#: includes/CPT.php:44
 msgid "New KB Article"
 msgstr ""
 
-#: includes/Output.php:87
+#: includes/Output.php:101
 msgid "No articles found."
 msgstr ""
 
-#: includes/CPT.php:39
+#: includes/CPT.php:51
 msgid "No KB articles found in Trash."
 msgstr ""
 
-#: includes/CPT.php:38
+#: includes/CPT.php:50
 msgid "No KB articles found."
 msgstr ""
 
-#: includes/Helper.php:368
+#: includes/Helper.php:373
 msgid "No results found."
 msgstr ""
 
-#: includes/Helper.php:354
+#: includes/Helper.php:358
 msgid "Order by"
 msgstr ""
 
-#: includes/CPT.php:37
+#: includes/CPT.php:49
 msgid "Parent KB Articles:"
 msgstr ""
 
@@ -175,17 +179,21 @@ msgstr ""
 msgid "Plugins: %1$s: %2$s"
 msgstr ""
 
-#: includes/CPT.php:26
+#: includes/CPT.php:38
 msgctxt "post type general name"
 msgid "KB Articles"
 msgstr ""
 
-#: includes/CPT.php:27
+#: includes/CPT.php:39
 msgctxt "post type singular name"
 msgid "KB Article"
 msgstr ""
 
-#: includes/CPT.php:42
+#: includes/Output.php:339
+msgid "Recent Articles"
+msgstr ""
+
+#: includes/CPT.php:54
 msgid "Remove KB article image"
 msgstr ""
 
@@ -206,20 +214,20 @@ msgstr ""
 msgid "RRZE Webteam"
 msgstr ""
 
-#: includes/Helper.php:350
+#: includes/Helper.php:353
 msgid "Search"
 msgstr ""
 
-#: includes/CPT.php:36
+#: includes/CPT.php:48
 msgid "Search KB Articles"
 msgstr ""
 
-#: includes/Helper.php:365
+#: includes/Helper.php:370
 msgid "Search Results"
 msgstr ""
 
 #. %s: Knowledge Base name
-#: includes/Helper.php:349
+#: includes/Helper.php:352
 #, php-format
 msgid "Search the %s"
 msgstr ""
@@ -228,11 +236,11 @@ msgstr ""
 msgid "Search Title"
 msgstr ""
 
-#: includes/CPT.php:41
+#: includes/CPT.php:53
 msgid "Set KB article image"
 msgstr ""
 
-#: includes/Output.php:94 includes/Output.php:155
+#: includes/Output.php:110 includes/Output.php:193
 msgid "Side Menu"
 msgstr ""
 
@@ -240,7 +248,7 @@ msgstr ""
 msgid "Slug"
 msgstr ""
 
-#: includes/Output.php:170
+#: includes/Output.php:208
 msgid "Subcategories"
 msgstr ""
 
@@ -248,94 +256,69 @@ msgstr ""
 msgid "Table"
 msgstr ""
 
-#: includes/Output.php:119
+#: includes/Output.php:135
 msgid "Table of contents"
 msgstr ""
 
-#: includes/Output.php:147
+#: includes/Output.php:183
 msgid "Tags"
 msgstr ""
 
-#: includes/Output.php:129
+#: includes/Output.php:143
 msgid "Target Groups"
 msgstr ""
 
-#: includes/CPT.php:76
+#: includes/CPT.php:86
 msgctxt "Taxonomy general name"
 msgid "KB Categories"
 msgstr ""
 
-#: includes/CPT.php:104
-msgctxt "Taxonomy general name"
-msgid "KB Tags"
-msgstr ""
-
-#: includes/CPT.php:132
+#: includes/CPT.php:143
 msgctxt "Taxonomy general name"
 msgid "KB Target Groups"
 msgstr ""
 
-#: includes/CPT.php:78
+#: includes/CPT.php:88
 msgctxt "Taxonomy plural name"
 msgid "KB Categories"
 msgstr ""
 
-#: includes/CPT.php:106
-msgctxt "Taxonomy plural name"
-msgid "KB Tags"
-msgstr ""
-
-#: includes/CPT.php:134
+#: includes/CPT.php:145
 msgctxt "Taxonomy plural name"
 msgid "KB Target Groups"
 msgstr ""
 
-#: includes/CPT.php:80
+#: includes/CPT.php:90
 msgctxt "Taxonomy singular name"
 msgid "Add New KB Category"
 msgstr ""
 
-#: includes/CPT.php:108
-msgctxt "Taxonomy singular name"
-msgid "Add New KB Tag"
-msgstr ""
-
-#: includes/CPT.php:136
+#: includes/CPT.php:147
 msgctxt "Taxonomy singular name"
 msgid "Add New KB Target Group"
 msgstr ""
 
-#: includes/CPT.php:79
+#: includes/CPT.php:89
 msgctxt "Taxonomy singular name"
 msgid "Edit KB Category"
 msgstr ""
 
-#: includes/CPT.php:107
-msgctxt "Taxonomy singular name"
-msgid "Edit KB Tag"
-msgstr ""
-
-#: includes/CPT.php:77
+#: includes/CPT.php:87
 msgctxt "Taxonomy singular name"
 msgid "KB Category"
 msgstr ""
 
-#: includes/CPT.php:135
+#: includes/CPT.php:146
 msgctxt "Taxonomy singular name"
 msgid "KB Edit Target Group"
 msgstr ""
 
-#: includes/CPT.php:105
-msgctxt "Taxonomy singular name"
-msgid "KB Tag"
-msgstr ""
-
-#: includes/CPT.php:133
+#: includes/CPT.php:144
 msgctxt "Taxonomy singular name"
 msgid "KB Target Group"
 msgstr ""
 
-#: includes/CPT.php:211
+#: includes/CPT.php:222
 msgid "Text"
 msgstr ""
 
@@ -363,23 +346,23 @@ msgstr ""
 msgid "Title (Z-A)"
 msgstr ""
 
-#: includes/Helper.php:478
+#: includes/Helper.php:491
 msgid "Uncategorized"
 msgstr ""
 
-#: includes/CPT.php:45
+#: includes/CPT.php:57
 msgid "Uploaded to this KB article"
 msgstr ""
 
-#: includes/CPT.php:224
+#: includes/CPT.php:235
 msgid "URL"
 msgstr ""
 
-#: includes/CPT.php:43
+#: includes/CPT.php:55
 msgid "Use as KB article image"
 msgstr ""
 
-#: includes/CPT.php:34
+#: includes/CPT.php:46
 msgid "View KB Article"
 msgstr ""
 

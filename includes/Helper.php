@@ -181,7 +181,7 @@ class Helper
         ];
     }
 
-    public static function make_context_menu($object = null)
+    public static function make_context_menu($object = null, $target_group = '')
     {
         if (is_null($object)) {
             return '';
@@ -210,10 +210,10 @@ class Helper
         $parentIds = array_column($parents, 'term_id');
         $parentIds[] = $category->term_id;
 
-        return self::render_category_tree(0, $parentIds, $category->term_id, $currentPostId);
+        return self::render_category_tree(0, $parentIds, $category->term_id, $currentPostId, $target_group);
     }
 
-    private static function render_category_tree($parent, $parentIds, $currentCategoryId, $currentPostId)
+    private static function render_category_tree($parent, $parentIds, $currentCategoryId, $currentPostId, $target_group = '')
     {
         $terms = get_terms([
                                'taxonomy'   => 'rrze-kb-category',
@@ -222,9 +222,16 @@ class Helper
                                'orderby'    => 'name',
                                'order'      => 'ASC',
                            ]);
+        //$terms = self::get_category_terms_by_target_group($target_group, true);
 
         if (empty($terms) || is_wp_error($terms)) {
             return '';
+        }
+
+        if (!empty($target_group)) {
+            $target_group_link_param = '?target-group=' . $target_group;
+        } else {
+            $target_group_link_param = '';
         }
 
         $output = '<ul>';
@@ -237,7 +244,7 @@ class Helper
             }
 
             $output .= '<li' . ($is_parent ? ' class="parent"' : '') . '>'
-                . '<a href="' . esc_url(get_category_link($term->term_id)) . '">'
+                . '<a href="' . esc_url(get_category_link($term->term_id)) . $target_group_link_param . '">'
                 . '<span class="dashicons dashicons-category"></span>'
                 . '<span class="link-text">' . esc_html($term->name) . '</span>'
                 . '</a>';
@@ -274,7 +281,7 @@ class Helper
                                 $link_close = '</span>';
                             } else {
                                 $class = '';
-                                $link_open = '<a href="' . get_the_permalink($post->ID) . '">';
+                                $link_open = '<a href="' . get_the_permalink($post->ID) . $target_group_link_param . '">';
                                 $link_close = '</a>';
                             }
 
@@ -296,7 +303,8 @@ class Helper
                     $term->term_id,
                     $parentIds,
                     $currentCategoryId,
-                    $currentPostId
+                    $currentPostId,
+                    $target_group
                 );
 
             }
@@ -339,9 +347,9 @@ class Helper
         if (!empty($_GET['kb-order'])) {
             $order_selected = in_array($_GET['kb-order'], array_keys($order_options) ? : []) ? $_GET['kb-order'] : 'title_asc';
         }
-        $target_group = '';
+        $target_group_input = '';
         if (isset($_GET['target-group'])) {
-            $target_group = '<input type="hidden" name="target-group" value="' . sanitize_title($_GET['target-group']) . '">';
+            $target_group_input = '<input type="hidden" name="target-group" value="' . sanitize_title($_GET['target-group']) . '">';
         }
         // Search form
         $output = '<div class="rrze-kb-search">'
@@ -352,7 +360,7 @@ class Helper
                   . '<input type="search" name="kb-search" class="" value="' . (isset($_GET['kb-search']) ? sanitize_text_field($_GET['kb-search']) : '') . '" aria-label="' . sprintf(__('Search the %s', 'rrze-knowledgebase'), $kb_name) . '" placeholder="' . sprintf(__('Search the %s', 'rrze-knowledgebase'), $kb_name) . '" />'
                   . '<button class="search-submit">' . __('Search', 'rrze-knowledgebase') . '</button>'
                   . '<input type="hidden" name="post_type" value="rrze-kb-article" />'
-                  . $target_group
+                  . $target_group_input
                   . '</div>'
                   . self::render_checklist_section('kb-category', __('Category', 'rrze-knowledgebase'), $category_options, $category_selected)
 					. self::render_radiolist_section('kb-order', __('Order by', 'rrze-knowledgebase'), $order_options, $order_selected)
@@ -364,7 +372,8 @@ class Helper
             $search = !empty($_GET['kb-search']) ? sanitize_text_field($_GET['kb-search']) : '';
             $search_categories = !empty($_GET['kb-category']) ? array_map('absint', $_GET['kb-category']) : [];
             $order = !empty($_GET['kb-order']) ? sanitize_text_field($_GET['kb-order']) : 'title_asc';
-            $search_results = self::get_articles($search, $search_categories, $order);
+            $target_group = !empty($_GET['target-group']) ? sanitize_title($_GET['target-group']) : '';
+            $search_results = self::get_articles($search, $search_categories, $order, $target_group);
 
             $output .= '<div class="rrze-kb-search-results"><h3>' . __('Search Results', 'rrze-knowledgebase') . '</h3>';
 
@@ -429,7 +438,7 @@ class Helper
         return $output;
     }
 
-    private static function get_articles($search = '', $categories = [], $order = 'title_asc') {
+    private static function get_articles($search = '', $categories = [], $order = 'title_asc', $target_group = '') {
         $args = [
             'post_type'              => 'rrze-kb-article',
             'posts_per_page'         => -1,
@@ -448,6 +457,14 @@ class Helper
                 'field'            => 'term_id',
                 'terms'            => array_map('absint', $categories),
                 'operator'         => 'IN',
+                'include_children' => true,
+            ];
+        }
+        if ( ! empty($target_group)) {
+            $args[ 'tax_query' ][] = [
+                'taxonomy'         => 'rrze-kb-target-group',
+                'field'            => 'slug',
+                'terms'            => sanitize_title($target_group),
                 'include_children' => true,
             ];
         }
@@ -516,7 +533,7 @@ class Helper
      * @param string $hex Hex-Farbwert, z.B. "#3498db" oder "3498db"
      * @return string "#000000" oder "#FFFFFF"
      */
-    function getContrastColor(string $hex): string
+    function get_contrast_color(string $hex): string
     {
         $hex = ltrim($hex, '#');
 
@@ -554,21 +571,70 @@ class Helper
         return ($contrastWhite > $contrastBlack) ? '#FFFFFF' : '#000000';
     }
 
-    public static function render_target_group_dropdown($selected = null) {
+    public static function render_target_group_dropdown($selected = '') {
 
         $output = '<form method="get">';
         $output .= wp_dropdown_categories([
                 'taxonomy'        => 'rrze-kb-target-group',
                 'depth'           => 1,
                 'name'            => 'target-group',
-                'show_option_all' => __('All target groups', 'rrze-knowledgebase'),
+                'show_option_none' => __('All target groups', 'rrze-knowledgebase'),
+                'option_none_value' => '',
                 'hide_empty'      => true,
                 'value_field'     => 'slug',
-                'selected'        => isset($_GET['target-group']) ? sanitize_text_field(wp_unslash($_GET['target-group'])) : '',
+                'selected'        => $selected,
                 'echo'            => false,
             ]);
+        if (!empty($_GET)) {
+            foreach ($_GET as $key => $value) {
+                if ($key === 'target-group')
+                    continue;
+                $output .= '<input type="hidden" name="' . esc_attr($key) . '" value="' . esc_attr($value) . '">';
+            }
+        }
         $output .= '<button type="submit">' . esc_html('Filter', 'rrze-knowledgebase') . '</button></form>';
         return $output;
+    }
+
+    public static function get_category_terms_by_target_group($target_group, $include_children = false) {
+        if (empty($target_group)) {
+            $terms = get_categories([
+                'taxonomy'   => 'rrze-kb-category',
+                'parent'     => 0,
+                'hide_empty' => false,
+                'include_children' => $include_children,
+            ]);
+            return $terms;
+        }
+
+        $post_ids = get_posts([
+              'post_type'      => 'rrze-kb-article',
+              'post_status'    => 'publish',
+              'posts_per_page' => -1,
+              'fields'         => 'ids',
+              'tax_query' => [
+                  'relation' => 'OR',
+                  [
+                      'taxonomy' => 'rrze-kb-target-group',
+                      'field'    => 'slug',
+                      'terms'    => $target_group,
+                  ],
+                  [
+                      'taxonomy' => 'rrze-kb-target-group',
+                      'operator' => 'NOT EXISTS',
+                  ],
+              ]
+          ]);
+
+        if (!empty($post_ids)) {
+            $terms = wp_get_object_terms($post_ids, 'rrze-kb-category', [
+                'orderby' => 'name',
+                'include_children' => $include_children,
+            ]);
+        } else {
+            $terms = [];
+        }
+        return $terms;
     }
 
 }

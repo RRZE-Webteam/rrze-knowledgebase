@@ -33,6 +33,7 @@
             .kb-category-description {
                 font-size: 0.8em;
             }
+            //@include rrze-kb-icon-list('category');
             ul.kb-subsubcategories,
             ul.kb-articles {
                 //font-size: .9em;
@@ -72,25 +73,7 @@
     }
 
     .kb-category-post-list {
-        //margin-top: 2em;
-        ul {
-            list-style: none;
-            padding: 0;
-            margin: 0;
-            li {
-                margin-bottom: 1em;
-                a {
-                    text-decoration: none;
-                    &:hover {
-                        text-decoration: underline;
-                    }
-                }
-            }
-            .dashicons {
-                margin-right: 0.25em;
-                text-decoration: none;
-            }
-        }
+        @include rrze-kb-icon-list('document');
     }
 
     .kb-category-breadcrumbs {
@@ -403,36 +386,7 @@
             }
         }
         .rrze-kb-articles {
-            margin: 1em 0 0;
-            padding: 0;
-            list-style-type: none;
-            /*@container kb-page-container (width > 800px) {
-                column-count: 2;
-            }
-            @container kb-page-container (width > 1000px) {
-                column-count: 2;
-            }
-            @container kb-page-container (width > 1200px) {
-                column-count: 3;
-            }*/
-            li {
-                //border: 1px solid #ccc;
-                //border-radius: 4px;
-                //border-bottom: 1px solid var(--rrze-kb-accent-color, #04316a);
-                padding: .25em .5em;
-                margin-bottom: .5em;
-                &:hover, &:focus, &:active {
-                    border-color: var(--rrze-kb-accent-color, #04316a);
-                    background-color: #f8f8f8;
-                }
-                a {
-                    display: block;
-                }
-                .dashicons {
-                    margin-right: .25em;
-                    text-decoration: none;
-                }
-            }
+            @include rrze-kb-icon-list('document');
         }
     }
 }
@@ -440,25 +394,7 @@
 .rrze-kb-recent-articles {
     margin-top: 2em;
     margin-bottom: 1em;
-    ul {
-        list-style: none;
-        padding: 0;
-        margin: 0;
-        li {
-            margin-bottom: .5em;
-            a {
-                text-decoration: none;
-                .dashicons {
-                    margin-right: .25em;
-                }
-                &:hover, &:focus, &:active {
-                    .link-text {
-                        text-decoration: underline;
-                    }
-                }
-            }
-        }
-    }
+    @include rrze-kb-icon-list('document');
 }
 
 @media print {

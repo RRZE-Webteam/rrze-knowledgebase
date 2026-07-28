@@ -359,7 +359,7 @@ class CPT
                 'term_color',
                 sanitize_hex_color($_POST['term_color'])
             );
-            $contrast_color = Helper::getContrastColor($_POST['term_color']);
+            $contrast_color = Helper::get_contrast_color($_POST['term_color']);
             update_term_meta(
                 $term_id,
                 'term_contrast_color',

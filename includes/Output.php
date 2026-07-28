@@ -11,15 +11,27 @@ class Output
 
     private string $target_group = '';
 
+    private string $target_group_get_param = '';
+
     public function __construct($object)
     {
+        $target_group_ids = get_terms([
+            'taxonomy'   => 'rrze-kb-target-group',
+            'hide_empty' => false,
+            'fields'     => 'ids',
+            'number'     => 1,
+        ]);
+
+        if (!is_wp_error($target_group_ids) && !empty($target_group_ids)) {
+            $this->has_target_groups = true;
+        }
+        if (!empty($_GET['target-group'])) {
+            $this->target_group = sanitize_title($_GET['target-group']);
+            $this->target_group_get_param = '?target-group=' . $this->target_group;
+        }
+
         if ( is_post_type_archive()) {
-            $this->subcategories = get_categories([
-                'taxonomy'   => 'rrze-kb-category',
-                'parent'     => 0,
-                'hide_empty' => false,
-                'include_children' => false,
-            ]);
+            $this->subcategories = Helper::get_category_terms_by_target_group($this->target_group);
         } elseif (is_a($object, 'WP_Term')) {
             $this->category = $object;
             if ( ! isset($this->category->term_id)) {
@@ -36,21 +48,6 @@ class Output
             $terms = get_the_terms( $object->ID, 'rrze-kb-category' );
             $this->category = $terms[0] ?? null;
         }
-
-        $target_group_ids = get_terms([
-            'taxonomy'   => 'rrze-kb-target-group',
-            'hide_empty' => false,
-            'fields'     => 'ids',
-            'number'     => 1,
-        ]);
-
-        if (!is_wp_error($target_group_ids) && !empty($target_group_ids)) {
-            $this->has_target_groups = true;
-        }
-
-        if (isset($_GET['target-group'])) {
-            $this->target_group = sanitize_title($_GET['target-group']);
-        }
     }
 
     public function render_archive()
@@ -64,7 +61,7 @@ class Output
             $page_class = 'rrze-kb-category-page';
         }
 
-        $context_menu = Helper::make_context_menu($this->category);
+        $context_menu = Helper::make_context_menu($this->category, $this->target_group);
 
         $output = '<div class="' . $page_class . '">'
             . Helper::make_breadcrumbs($this->category)
@@ -73,7 +70,7 @@ class Output
         $output .= '<div class="entry-content"><h1 class="entry-title">' . $title . '</h1>';
 
         if (is_post_type_archive()) {
-            $output .= $this->has_target_groups ? Helper::render_target_group_dropdown() : '';
+            $output .= $this->has_target_groups ? Helper::render_target_group_dropdown($this->target_group) : '';
             $output .= Helper::render_search();
         }
 
@@ -87,8 +84,16 @@ class Output
             while (have_posts()) : the_post();
 
                 $classes = get_post_class('', get_the_ID());
+                if (!empty($_GET['target-group'])) {
+                    $target_group = sanitize_title($_GET['target-group']);
+                    $article_target_groups = get_the_terms(get_the_ID(), 'rrze-kb-target-group');
+                    $article_target_groups_slugs = wp_list_pluck($article_target_groups, 'slug');
+                    if ($article_target_groups && !is_wp_error($article_target_groups) && !in_array($target_group, $article_target_groups_slugs)) {
+                        continue;
+                    }
+                }
                 $output  .= '<li class="' . esc_attr(implode(' ', $classes)) . '">'
-                            . '<a href="' . get_the_permalink() . '">'
+                            . '<a href="' . get_the_permalink() . $this->target_group_get_param . '">'
                             . '<span class="dashicons dashicons-media-document"></span>'
                             . '<span class="link-text">' . get_the_title() . '</span>'
                             . '</a>'
@@ -129,7 +134,7 @@ class Output
         $modifiedHtml = Helper::make_toc(get_the_content());
         $toc = $modifiedHtml['toc'] ?? '';
         $content = $modifiedHtml['html'] ?? '';
-        $context_menu = Helper::make_context_menu($post);
+        $context_menu = Helper::make_context_menu($post, $this->target_group);
         $last_modified = get_the_modified_date(get_option( 'date_format' ) . ' - ' . get_option( 'time_format' ), $post);
 
         $output = '<div class="rrze-kb-article-page">'
@@ -155,7 +160,7 @@ class Output
                 }
                 $contrast_color = get_term_meta($target_group->term_id, 'term_contrast_color', true);
                 if (empty($contrast_color)) {
-                    $contrast_color = Helper::getContrastColor($term_color);
+                    $contrast_color = Helper::get_contrast_color($term_color);
                 }
                 if (!is_wp_error($link)) {
                     $output .= '<li><a href="' . esc_url($link) . '" style="background-color: ' . sanitize_hex_color($term_color) . '; color: ' . sanitize_hex_color($contrast_color) . ';">'
@@ -183,11 +188,11 @@ class Output
         }
 
         $output .= '<footer class="entry-footer">';
-        $tags = get_the_terms($post->ID, 'rrze-kb-tag');
+        /*$tags = get_the_terms($post->ID, 'rrze-kb-tag');
         if (!empty($tags)) {
             $names = wp_list_pluck($tags, 'name');
             $output .= '<div class="rrze-kb-tags">' . __('Tags', 'rrze-knowledgebase') . ': ' . implode(', ', $names) . '</div>';
-        }
+        }*/
         /* translators: %s: Date + time */
         $output .= '<div class="last-modified">' . sprintf(__('Last modified: %s', 'rrze-knowledgebase'), $last_modified) . '</div>';
         $output .= '</footer>';
@@ -218,7 +223,7 @@ class Output
         foreach ($subcategories as $subcategory) :
 
             $output .= '<article class="kb-category-card">'
-                       . '<h1><a href="' . esc_url(get_category_link($subcategory->term_id)) . '">'
+                       . '<h1><a href="' . esc_url(get_category_link($subcategory->term_id)) . $this->target_group_get_param .  '">'
                        . esc_html($subcategory->name) . '</a></h1>';
 
             if ($subcategory->description) :
@@ -243,9 +248,16 @@ class Output
             ];
             if (!empty($target_group)) {
                 $args['tax_query'][] = [
-                    'taxonomy'         => 'rrze-kb-target-group',
-                    'field'            => 'slug',
-                    'terms'            => $target_group,
+                    'relation' => 'OR',
+                    [
+                        'taxonomy' => 'rrze-kb-target-group',
+                        'field'    => 'slug',
+                        'terms'    => $target_group,
+                    ],
+                    [
+                        'taxonomy' => 'rrze-kb-target-group',
+                        'operator' => 'NOT EXISTS',
+                    ],
                 ];
             }
             $subarticles = get_posts($args);
@@ -257,7 +269,7 @@ class Output
                 foreach ($subarticles as $subarticle) :
 
                     $output .= '<li class="">'
-                               . '<a href="' . esc_url(get_permalink($subarticle->ID)) . '" class="kb-articles">'
+                               . '<a href="' . esc_url(get_permalink($subarticle->ID)) . $this->target_group_get_param . '" class="kb-articles">'
                                . '<span class="dashicons dashicons-media-document"></span>'
                                . '<span class="link-text">' . esc_html($subarticle->post_title) . '</span>'
                                . '</a></li>';
@@ -293,7 +305,7 @@ class Output
                                            ]))->found_posts;
 
                     $output .= '<li class="">'
-                               . '<a href="' . esc_url(get_category_link($subsubcategory->term_id)) . '" class="kb-subsubcategories">'
+                               . '<a href="' . esc_url(get_category_link($subsubcategory->term_id)) . $this->target_group_get_param . '" class="kb-subsubcategories">'
                                . '<span class="dashicons dashicons-category"></span>'
                                . '<span class="link-text">' . esc_html($subsubcategory->name)
                                     . '<span class="count"> (' . $count . ')</span>'
@@ -321,14 +333,30 @@ class Output
             'posts_per_page' => (int) $number,
             'orderby' => 'date',
             'order' => 'DESC',
+            'tax_query' => ['relation' => 'AND']
         ];
         if ( ! is_null($category)) {
-            $args['tax_query'] = [[
+            $args['tax_query'][] = [
                'taxonomy' => 'rrze-kb-category',
                'field' => 'term_id',
                'terms' => $category,
                 'include_children' => true,
-            ]];
+            ];
+        }
+        if (!empty($_GET['target-group'])) {
+            $args['tax_query'][] = [
+                'relation' => 'OR',
+                [
+                    'taxonomy' => 'rrze-kb-target-group',
+                    'field'    => 'slug',
+                    'terms'    => sanitize_title($_GET['target-group']),
+                    'include_children' => true,
+                ],
+                [
+                    'taxonomy' => 'rrze-kb-target-group',
+                    'operator' => 'NOT EXISTS',
+                ],
+            ];
         }
         $recent_articles = get_posts($args);
         $output = '';
@@ -337,7 +365,7 @@ class Output
             $output .= '<h2>' . __('Recent Articles', 'rrze-knowledgebase') . '</h2><ul>';
             foreach ($recent_articles as $article) :
                 $output .= '<li class="kb-recent-article">'
-                           . '<a href="' . esc_url(get_permalink($article->ID)) . '">'
+                           . '<a href="' . esc_url(get_permalink($article->ID)) . $this->target_group_get_param . '">'
                            . '<span class="dashicons dashicons-media-document"></span>'
                            . '<span class="link-text">' . esc_html($article->post_title) . '</span></a>';
                 if ($article->post_excerpt) :
