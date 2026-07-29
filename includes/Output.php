@@ -79,7 +79,7 @@ class Output
         }
 
         if ((is_tax('rrze-kb-category')|| is_tax('rrze-kb-target-group')) && have_posts()) {
-            $output .= '<h2>' . __('Articles', 'rrze-knowledgebase') . '</h2><div class="kb-category-post-list"><ul>';
+            $output .= '<h2>' . __('Articles', 'rrze-knowledgebase') . '</h2><div class="kb-article-list"><ul class="rrze-kb-article-list">';
 
             while (have_posts()) : the_post();
 
@@ -362,7 +362,7 @@ class Output
         $output = '';
         if ( ! empty($recent_articles)) :
             $output .= '<div class="rrze-kb-recent-articles">';
-            $output .= '<h2>' . __('Recent Articles', 'rrze-knowledgebase') . '</h2><ul>';
+            $output .= '<h2>' . __('Recent Articles', 'rrze-knowledgebase') . '</h2><ul class="rrze-kb-article-list">';
             foreach ($recent_articles as $article) :
                 $output .= '<li class="kb-recent-article">'
                            . '<a href="' . esc_url(get_permalink($article->ID)) . $this->target_group_get_param . '">'

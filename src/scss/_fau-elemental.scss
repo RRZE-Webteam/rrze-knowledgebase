@@ -1,17 +1,19 @@
 @mixin fau-elemental-icon-list() {
-    ul {
-        li {
-            a {
+    font-size: var(--P-Body-Text, 1.125rem);
+    li {
+        a {
+            .link-text {
+                text-decoration: underline;
+                text-decoration-thickness: var(--Spacing-05x);
+                text-underline-offset: var(--Spacing-1x);
+            }
+            &:hover, &:focus, &:active {
                 .link-text {
-                    text-decoration: underline;
-                    text-decoration-thickness: var(--Spacing-05x);
-                    text-underline-offset: var(--Spacing-1x);
+                    text-decoration-thickness: var(--Spacing-1x);
                 }
-                &:hover, &:focus, &:active {
-                    .link-text {
-                        text-decoration-thickness: var(--Spacing-1x);
-                    }
-                }
+            }
+            .dashicons {
+                margin-top: .25em;
             }
         }
     }
@@ -46,10 +48,76 @@
                     }
                 }
             }
+            ul.rrze-kb-article-list {
+                font-size: unset;
+                a {
+                    .link-text {
+                        text-decoration: none;
+                    }
+                }
+            }
         }
         .entry-content {
             .entry-title {
                 margin-top: 0;
+            }
+        }
+        ul.rrze-kb-article-list {
+            font-size: var(--P-Body-Text, 1.125rem);
+            li {
+                a {
+                    .link-text {
+                        text-decoration: underline;
+                        text-decoration-thickness: var(--Spacing-05x);
+                        text-underline-offset: var(--Spacing-1x);
+                    }
+                    &:hover, &:focus, &:active {
+                        .link-text {
+                            text-decoration-thickness: var(--Spacing-1x);
+                        }
+                    }
+                    .dashicons {
+                        margin-top: .25em;
+                    }
+                }
+            }
+        }
+        .rrze-kb-recent-articles {
+            margin-top: var(--width-gutter, 30px);
+            background-color: var(--FAU-Col-FAU-Dunkelblau-12_5, #DFE2E7);
+            padding: var(--width-gutter-half, 15px);
+            font-size: var(--P-Body-Text-Small, 1rem);
+            @container kb-category-container (width > 800px) {
+                padding: var(--width-gutter, 30px);
+                margin-top: calc(2 * var(--width-gutter, 30px));
+            }
+            @container kb-page-container (width > 800px) {
+                padding: var(--width-gutter, 30px);
+                margin-top: calc(2 * var(--width-gutter, 30px));
+            }
+            h2{
+                margin-top: 0;
+                font-size: 1.8rem;
+                margin-bottom: .5em;
+            }
+            .rrze-kb-article-list {
+                font-size: var(--P-Body-Text-Small, 1rem);
+            }
+        }
+        .rrze-kb-target-group-select {
+            gap: 0;
+            select,
+            button {
+                font-size: var(--P-Body-Text-Small, 1rem);
+            }
+            select {
+                border-color: var(--FAU-Col-FAU-Blau-100, #04316a);
+                border-right-color: #fff;
+            }
+            button {
+                background-color: var(--FAU-Col-FAU-Dunkelblau-100, #041e42);
+                color: #fff;
+                border-color: var(--FAU-Col-FAU-Dunkelblau-100, #041e42);
             }
         }
     }
@@ -74,8 +142,7 @@
             }
             .rrze-kb-toc-container {
                 .rrze-kb-toc {
-                    font-size: unset;
-                    @include fau-elemental-icon-list();
+                    font-size: var(--P-Body-Text-Small, 1rem);
                 }
             }
             .last-modified,
@@ -88,12 +155,12 @@
     }
     .rrze-kb-start-page,
     .rrze-kb-category-page {
-        .kb-category-post-list {
-            font-size: var(--P-Body-Text, 1.125rem);
-        }
         .kb-category-grid {
             .kb-category-card {
                 font-size: var(--P-Body-Text, 1.125rem);
+                box-shadow: 4px 4px 0 var(--FAU-Col-FAU-Dunkelblau-100, #041e42);
+                border-color: var(--FAU-Col-FAU-Blau-100, #04316a);
+                border-radius: 0;
                 h1 {
                     margin-top: 0;
                     font-size: 1.5rem;
@@ -110,14 +177,34 @@
                     font-size: unset;
                     margin: 0 0 .5em;
                 }
-                @include fau-elemental-icon-list();
+                ul.kb-subsubcategories {
+                    @include fau-elemental-icon-list();
+                }
             }
         }
     }
     .rrze-kb-start-page {
         padding-top: var(--width-gutter, 30px);
         .rrze-kb-search {
+            border: none;
+            padding: 0;
+            h2 {
+                background-color: var(--FAU-Col-FAU-Blau-100, #04316a);
+                color: #fff;
+                margin-top: 0;
+                margin-bottom: 0;
+                padding: var(--width-gutter-half, 15px);
+                @container kb-page-container (width > 800px) {
+                    padding: var(--width-gutter, 30px) var(--width-gutter, 30px) 20px;
+                }
+            }
             .rrze-kb-search-form {
+                background-color: var(--FAU-Col-FAU-Blau-100, #04316a);
+                color: #fff;
+                padding: 0 var(--width-gutter-half, 15px) var(--width-gutter-half, 15px);
+                @container kb-page-container (width > 800px) {
+                    padding: 0 var(--width-gutter, 30px) var(--width-gutter, 30px);
+                }
                 .kb-search-input-wrapper {
                     display: flex;
                     flex-wrap: wrap;
@@ -146,17 +233,17 @@
                 }
                 button.search-submit,
                 button.submit-filter {
-                    background-color: var(--FAU-Col-FAU-Blau-100, #04316a);
+                    background-color: var(--FAU-Col-FAU-Dunkelblau-100, #041e42);
                     color: #fff;
-                    border: 1px solid var(--FAU-Col-FAU-Blau-100, #04316a);
+                    border: 1px solid var(--FAU-Col-FAU-Dunkelblau-100, #041e42);
                     min-height: 48px;
                     padding: 10px;
                     font-size: var(--P-Body-Text-Small, 1rem);
                     line-height: 1.5;
                 }
                 button.search-submit {
-                    background-color: var(--FAU-Col-FAU-Blau-100, #04316a);
-                    color: var(--FAU-Col-FAU-Blau-100, #04316a);
+                    background-color: var(--FAU-Col-FAU-Dunkelblau-100, #041e42);
+                    color: var(--FAU-Col-FAU-Dunkelblau-100, #041e42);
                     margin-bottom: 0;
                     margin-right: 0;
                     margin-top: 0;
@@ -197,7 +284,7 @@
                     .checklist-toggle {
                         width: 100%;
                         min-height: 48px;
-                        background: rgba(0, 0, 0, 0);
+                        background: #fff;
                         border: 1px solid var(--FAU-Col-FAU-Blau-100, #04316a);
                         border-radius: var(--border-radius-buttons, 3px);
                         color: var(--FAU-Col-FAU-Blau-100, #04316a);
@@ -210,7 +297,7 @@
                         .icon-wrapper {
                             width: 48px;
                             height: 48px;
-                            background-color: var(--FAU-Col-FAU-Blau-100, #04316a);
+                            background-color: var(--FAU-Col-FAU-Dunkelblau-100, #041e42);
                             position: absolute;
                             right: 0;
                             top: 0;
@@ -241,6 +328,7 @@
                     overflow-x: hidden;
                     overflow-y: scroll;
                     background: #fff;
+                    color: var(--FAU-Col-FAU-Schwarz-100, #000);
                     @media (min-width: 768px) {
                         position: absolute;
                         z-index: 10;
@@ -313,10 +401,13 @@
                 }
             }
             .rrze-kb-search-results {
+                margin-top: var(--width-gutter, 30px);
+                h3 {
+                    margin-top: 0;
+                }
                 h4 {
                     margin-bottom: var(--Spacing-1x, 0.25rem);
                 }
-                @include fau-elemental-icon-list();
             }
         }
     }
@@ -326,8 +417,5 @@
                 padding-top: var(--width-gutter, 30px);
             }
         }
-    }
-    .rrze-kb-recent-articles {
-        @include fau-elemental-icon-list();
     }
 }

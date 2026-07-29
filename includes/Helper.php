@@ -272,7 +272,7 @@ class Helper
                                            ],
                                        ]);
                     if ($posts) {
-                        $output .= '<ul class="rrze-kb-articles">';
+                        $output .= '<ul class="rrze-kb-article-list">';
 
                         foreach ($posts as $post) {
                             if ($post->ID === $currentPostId){
@@ -384,7 +384,7 @@ class Helper
 
                 foreach ($articles_grouped as $group => $articles) {
                     $output .= '<h4>'. $group . '</h4>'
-                        . '<ul>';
+                        . '<ul class="rrze-kb-article-list">';
                     foreach ($articles as $article) {
                         $output .= '<li class="rrze-kb-article"><a href="' . get_the_permalink($article->ID) . '">'
                                    . '<span class="dashicons dashicons-media-document"></span>'
@@ -573,7 +573,7 @@ class Helper
 
     public static function render_target_group_dropdown($selected = '') {
 
-        $output = '<form method="get">';
+        $output = '<form method="get" class="rrze-kb-target-group-select">';
         $output .= wp_dropdown_categories([
                 'taxonomy'        => 'rrze-kb-target-group',
                 'depth'           => 1,

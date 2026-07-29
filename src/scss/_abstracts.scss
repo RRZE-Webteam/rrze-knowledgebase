@@ -13,26 +13,24 @@
 }
 
 @mixin rrze-kb-icon-list($type: 'document') {
-    ul {
-        list-style: none;
-        padding: 0;
-        margin: 0;
+    list-style: none;
+    padding: 0;
+    margin: 0;
 
-        li {
-            margin-bottom: .5em;
+    li {
+        margin-bottom: .5em;
 
-            a {
-                text-decoration: none;
+        a {
+            text-decoration: none;
 
-                .dashicons,
-                .kb-icon {
-                    margin-right: .25em;
-                }
+            .dashicons,
+            .kb-icon {
+                margin-right: .25em;
+            }
 
-                &:hover, &:focus, &:active {
-                    .link-text {
-                        text-decoration: underline;
-                    }
+            &:hover, &:focus, &:active {
+                .link-text {
+                    text-decoration: underline;
                 }
             }
         }
