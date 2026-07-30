@@ -179,14 +179,20 @@
             }
         }
     }
+
+    .rrze-kb-target-group {
+        margin-bottom: 1em;
+    }
+
     .rrze-kb-target-group-select {
         display: flex;
+        flex-wrap: wrap;
         align-items: center;
         justify-content: flex-end;
-        gap: .25em;
+        column-gap: .25em;
         margin-bottom: 1em;
         label {
-            font-weight: bold;
+            //font-weight: bold;
         }
         select, button {
             border-radius: 0;
@@ -203,6 +209,11 @@
             &:hover, &:focus, &:active {
                 background-color: #ccc;
             }
+        }
+    }
+    .rrze-kb-sidebar .rrze-kb-target-group-select {
+        label {
+            width: 100%;
         }
     }
 }

@@ -11,7 +11,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "POT-Creation-Date: 2026-07-21 10:18+0000\n"
-"PO-Revision-Date: 2026-07-28 09:48+0000\n"
+"PO-Revision-Date: 2026-07-30 13:24+0000\n"
 "X-Generator: Loco https://localise.biz/\n"
 "X-Domain: rrze-knowledgebase\n"
 "Language: de_DE\n"
@@ -22,7 +22,7 @@ msgstr ""
 "X-Loco-Template-Mode: PO,JSON"
 
 #. %s: Knowledge Base name
-#: includes/Helper.php:60
+#: includes/Helper.php:82
 #, php-format
 msgid "%s Breadcrumb Navigation"
 msgstr "%s Navigationspfad"
@@ -54,11 +54,11 @@ msgstr "Wissensdatenbank"
 msgid "All KB Articles"
 msgstr "Alle KB-Artikel"
 
-#: includes/Helper.php:573
+#: includes/Helper.php:603
 msgid "All target groups"
 msgstr "Alle Zielgruppen"
 
-#: includes/Helper.php:410 includes/Helper.php:427
+#: includes/Helper.php:440 includes/Helper.php:457
 msgid "Apply filter"
 msgstr "Filter anwenden"
 
@@ -66,23 +66,23 @@ msgstr "Filter anwenden"
 msgid "Article views"
 msgstr "Artikel-Ansichten"
 
-#: includes/Output.php:79
+#: includes/Output.php:95
 msgid "Articles"
 msgstr "Artikel"
 
-#: includes/Helper.php:357
+#: includes/Helper.php:387
 msgid "Category"
 msgstr "Kategorie"
 
-#: includes/Helper.php:336
+#: includes/Helper.php:366
 msgid "Date (newest first)"
 msgstr "Datum (neueste zuerst)"
 
-#: includes/Helper.php:335
+#: includes/Helper.php:365
 msgid "Date (oldest first)"
 msgstr "Datum (älteste zuerst)"
 
-#: includes/CPT.php:180 includes/Output.php:170
+#: includes/CPT.php:180 includes/Output.php:201
 msgid "Dependencies"
 msgstr "Abhängigkeiten"
 
@@ -118,7 +118,7 @@ msgstr "KB-Artikelbild"
 msgid "KB Article views"
 msgstr "KB-Artikel-Ansichten"
 
-#: includes/Settings.php:13 includes/Helper.php:57 includes/Helper.php:315
+#: includes/Settings.php:13 includes/Helper.php:79 includes/Helper.php:345
 msgid "Knowledge Base"
 msgstr "Wissensdatenbank"
 
@@ -127,7 +127,7 @@ msgid "knowledgebase"
 msgstr "wissensdatenbank"
 
 #. %s: Date + time
-#: includes/Output.php:186
+#: includes/Output.php:217
 #, php-format
 #| msgid "Last modified: "
 msgid "Last modified: %s"
@@ -149,7 +149,7 @@ msgstr "Name"
 msgid "New KB Article"
 msgstr "Neuer KB-Artikel"
 
-#: includes/Output.php:101
+#: includes/Output.php:125
 msgid "No articles found."
 msgstr "Keine Artikel gefunden."
 
@@ -161,11 +161,11 @@ msgstr "Keine KB-Artikel im Papierkorb gefunden."
 msgid "No KB articles found."
 msgstr "Keine KB-Artikel gefunden."
 
-#: includes/Helper.php:373
+#: includes/Helper.php:403
 msgid "No results found."
 msgstr "Keine Ergebnisse gefunden."
 
-#: includes/Helper.php:358
+#: includes/Helper.php:388
 msgid "Order by"
 msgstr "Sortieren nach"
 
@@ -193,7 +193,7 @@ msgctxt "post type singular name"
 msgid "KB Article"
 msgstr "KB-Artikel"
 
-#: includes/Output.php:339
+#: includes/Output.php:385
 msgid "Recent Articles"
 msgstr "Neueste Artikel"
 
@@ -218,7 +218,7 @@ msgstr "RRZE Knowledge Base Einstellungen"
 msgid "RRZE Webteam"
 msgstr "RRZE-Webteam"
 
-#: includes/Helper.php:353
+#: includes/Helper.php:383
 msgid "Search"
 msgstr "Suchen"
 
@@ -226,12 +226,12 @@ msgstr "Suchen"
 msgid "Search KB Articles"
 msgstr "KB-Artikel durchsuchen"
 
-#: includes/Helper.php:370
+#: includes/Helper.php:400
 msgid "Search Results"
 msgstr "Suchergebnisse"
 
 #. %s: Knowledge Base name
-#: includes/Helper.php:352
+#: includes/Helper.php:382
 #, php-format
 msgid "Search the %s"
 msgstr "%s durchsuchen"
@@ -244,7 +244,7 @@ msgstr "Titel der Suche"
 msgid "Set KB article image"
 msgstr "KB-Artikelbild setzen"
 
-#: includes/Output.php:110 includes/Output.php:193
+#: includes/Output.php:140 includes/Output.php:224
 msgid "Side Menu"
 msgstr "Seitenmenü"
 
@@ -252,7 +252,7 @@ msgstr "Seitenmenü"
 msgid "Slug"
 msgstr "Slug"
 
-#: includes/Output.php:208
+#: includes/Output.php:239
 msgid "Subcategories"
 msgstr "Unterkategorien"
 
@@ -260,15 +260,15 @@ msgstr "Unterkategorien"
 msgid "Table"
 msgstr "Tabelle"
 
-#: includes/Output.php:135
+#: includes/Output.php:166
 msgid "Table of contents"
 msgstr "Inhaltsverzeichnis"
 
-#: includes/Output.php:183
-msgid "Tags"
-msgstr "Schlagwörter"
+#: includes/Helper.php:611
+msgid "Target group"
+msgstr "Zielgruppe"
 
-#: includes/Output.php:143
+#: includes/Output.php:174
 msgid "Target Groups"
 msgstr "Zielgruppen"
 
@@ -346,15 +346,15 @@ msgstr ""
 "Auf dem Server läuft WordPress Version %1$s. Das Plugin erfordert mindestens "
 "WordPress Version %2$s."
 
-#: includes/Helper.php:333
+#: includes/Helper.php:363
 msgid "Title (A-Z)"
 msgstr "Titel (A-Z)"
 
-#: includes/Helper.php:334
+#: includes/Helper.php:364
 msgid "Title (Z-A)"
 msgstr "Titel (Z-A)"
 
-#: includes/Helper.php:491
+#: includes/Helper.php:521
 msgid "Uncategorized"
 msgstr "Ohne Kategorie"
 

@@ -13,6 +13,8 @@ class Output
 
     private string $target_group_get_param = '';
 
+    private string $target_group_color = '#fff';
+
     public function __construct($object)
     {
         $target_group_ids = get_terms([
@@ -29,6 +31,17 @@ class Output
             $this->target_group = sanitize_title($_GET['target-group']);
             $this->target_group_get_param = '?target-group=' . $this->target_group;
         }
+        if ($this->has_target_groups) {
+            $target_group_term = get_term_by('slug', $this->target_group, 'rrze-kb-target-group');
+            if ($target_group_term && ! is_wp_error($target_group_term)) {
+                $term_color = get_term_meta($target_group_term->term_id, 'term_color', true);
+                if ( ! empty($term_color)) {
+                    $this->target_group_color = sanitize_hex_color($term_color);
+                } else {
+                    $this->target_group_color = '#04316a';
+                }
+            }
+        }
 
         if ( is_post_type_archive()) {
             $this->subcategories = Helper::get_category_terms_by_target_group($this->target_group);
@@ -40,7 +53,7 @@ class Output
                 $this->subcategories = get_categories([
                     'taxonomy'   => 'rrze-kb-category',
                     'parent'     => $this->category->term_id,
-                    'hide_empty' => false,
+                    'hide_empty' => true,
                     'include_children' => false,
                 ]);
             }
@@ -64,13 +77,13 @@ class Output
         $context_menu = Helper::make_context_menu($this->category, $this->target_group);
 
         $output = '<div class="' . $page_class . '">'
-            . Helper::make_breadcrumbs($this->category)
+            . Helper::make_breadcrumbs($this->category, $this->target_group_get_param)
             . '<div class="rrze-kb-category-inner">';
 
         $output .= '<div class="entry-content"><h1 class="entry-title">' . $title . '</h1>';
 
         if (is_post_type_archive()) {
-            $output .= $this->has_target_groups ? Helper::render_target_group_dropdown($this->target_group) : '';
+            $output .= $this->has_target_groups ? Helper::render_target_group_dropdown($this->target_group, $this->target_group_color) : '';
             $output .= Helper::render_search();
         }
 
@@ -118,7 +131,14 @@ class Output
 
         // Context Menu
         if (!empty($context_menu)) {
-            $output .= '<nav class="rrze-kb-context-menu" aria-label="' . __('Side Menu', 'rrze-knowledgebase') . '">' . $context_menu . '</nav>';
+            $output .= '<div class="rrze-kb-sidebar">';
+
+            if ($this->has_target_groups) {
+                $output .= '<div class="rrze-kb-target-group">' . Helper::render_target_group_dropdown($this->target_group, $this->target_group_color) . '</div>';
+            }
+
+            $output .=  '<nav class="rrze-kb-context-menu" aria-label="' . __('Side Menu', 'rrze-knowledgebase') . '">' . $context_menu . '</nav>'
+                . '</div>';
         }
 
         $output .= '</div></div>';
@@ -139,7 +159,7 @@ class Output
 
         $output = '<div class="rrze-kb-article-page">'
         // Breadcrumbs
-            . Helper::make_breadcrumbs($post)
+            . Helper::make_breadcrumbs($post, $this->target_group_get_param)
             . '<div class="rrze-kb-article-inner">';
         // ToC
         if (!empty($toc)) {
@@ -282,7 +302,7 @@ class Output
             $subsubcategories = get_categories([
                                                    'taxonomy'   => 'rrze-kb-category',
                                                    'parent'     => $subcategory->term_id,
-                                                   'hide_empty' => false,
+                                                   'hide_empty' => true,
                                                ]);
 
             if ( ! empty($subsubcategories)) :
@@ -290,7 +310,7 @@ class Output
                 $output .= '<ul class="kb-subsubcategories">';
 
                 foreach ($subsubcategories as $subsubcategory) :
-                    $count = (new \WP_Query([
+                    /*$count = (new \WP_Query([
                                                'post_type'      => 'rrze-kb-article',
                                                'post_status'    => 'publish',
                                                'posts_per_page' => 1, // only 1 article is loaded, but all are counted
@@ -302,13 +322,13 @@ class Output
                                                        'terms'    => $subsubcategory->term_id,
                                                    ],
                                                ],
-                                           ]))->found_posts;
+                                           ]))->found_posts;*/
 
                     $output .= '<li class="">'
                                . '<a href="' . esc_url(get_category_link($subsubcategory->term_id)) . $this->target_group_get_param . '" class="kb-subsubcategories">'
                                . '<span class="dashicons dashicons-category"></span>'
                                . '<span class="link-text">' . esc_html($subsubcategory->name)
-                                    . '<span class="count"> (' . $count . ')</span>'
+                               //     . '<span class="count"> (' . $count . ')</span>'
                                . '</span>'
                                . '</a></li>';
                 endforeach;

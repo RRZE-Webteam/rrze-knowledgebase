@@ -33,7 +33,29 @@ class Helper
         return $parents;
     }
 
-    public static function make_breadcrumbs($object) {
+    public static function get_term_top_parent($term_id, $taxonomy) {
+        $top_parent = null;
+
+        $term = get_term($term_id, $taxonomy);
+
+        if (is_wp_error($term) || !$term) {
+            return $top_parent;
+        }
+
+        while ($term->parent) {
+            $parent_term = get_term($term->parent, $taxonomy);
+
+            if (is_wp_error($parent_term) || !$parent_term) {
+                break;
+            }
+
+            $term = $parent_term;
+        }
+
+        return $term;
+    }
+
+    public static function make_breadcrumbs($object, $get_param = false) {
 
         if (is_a($object, 'WP_Post')) {
             $title = $object->post_title ?? '';
@@ -59,7 +81,7 @@ class Helper
         /* translators: %s: Knowledge Base name */
         $output = '<nav class="kb-category-navigation" aria-label="' . sprintf(esc_attr__('%s Breadcrumb Navigation', 'rrze-knowledgebase'), $kb_name) . '">'
                   . '<ul class="kb-category-breadcrumbs">'
-                  . '<li><a href="' . esc_url(get_post_type_archive_link('rrze-kb-article')) . '" class="kb-category-back-link">' . $kb_name . '</a></li>';
+                  . '<li><a href="' . esc_url(get_post_type_archive_link('rrze-kb-article') . $get_param ?? '') . '" class="kb-category-back-link">' . $kb_name . '</a></li>';
         if ($parents) {
             foreach ($parents as $parent) {
                 $output .= '<li><a href="' . esc_url(get_category_link($parent->term_id)) . '" class="kb-category-back-link">' . esc_html($parent->name) . '</a></li>';
@@ -218,11 +240,12 @@ class Helper
         $terms = get_terms([
                                'taxonomy'   => 'rrze-kb-category',
                                'parent'     => $parent,
-                               'hide_empty' => false,
+                               'hide_empty' => true,
                                'orderby'    => 'name',
                                'order'      => 'ASC',
                            ]);
-        //$terms = self::get_category_terms_by_target_group($target_group, true);
+        //$terms = self::get_category_terms_by_target_group($target_group, $parent);
+        //print "<pre>"; var_dump($parent, $terms);print "</pre><hr />";
 
         if (empty($terms) || is_wp_error($terms)) {
             return '';
@@ -323,7 +346,7 @@ class Helper
         $kb_name = $options['name'] ?? __('Knowledge Base', 'rrze-knowledgebase');
         $categories = get_terms([
             'taxonomy'   => 'rrze-kb-category',
-            'hide_empty' => false,
+            'hide_empty' => true,
             'parent'     => 0,
             'orderby'    => 'name',
             'order'      => 'ASC',
@@ -571,10 +594,10 @@ class Helper
         return ($contrastWhite > $contrastBlack) ? '#FFFFFF' : '#000000';
     }
 
-    public static function render_target_group_dropdown($selected = '') {
+    public static function render_target_group_dropdown($selected = '', $color = '#fff') {
 
         $output = '<form method="get" class="rrze-kb-target-group-select">';
-        $output .= wp_dropdown_categories([
+        $dropdown = wp_dropdown_categories([
                 'taxonomy'        => 'rrze-kb-target-group',
                 'depth'           => 1,
                 'name'            => 'target-group',
@@ -585,6 +608,9 @@ class Helper
                 'selected'        => $selected,
                 'echo'            => false,
             ]);
+        $select_id = 'target-group-select-sidebar';
+        $output .= '<label for="' . $select_id . '">' . __('Target group', 'rrze-knowledgebase') . ':</label>';
+        $output .= str_replace('<select', '<select style="border-bottom-color: ' . sanitize_hex_color($color) . ';" id="' . $select_id . '"', $dropdown);
         if (!empty($_GET)) {
             foreach ($_GET as $key => $value) {
                 if ($key === 'target-group')
@@ -596,45 +622,54 @@ class Helper
         return $output;
     }
 
-    public static function get_category_terms_by_target_group($target_group, $include_children = false) {
+    public static function get_category_terms_by_target_group($target_group, $parentId = 0) {
         if (empty($target_group)) {
             $terms = get_categories([
                 'taxonomy'   => 'rrze-kb-category',
                 'parent'     => 0,
-                'hide_empty' => false,
-                'include_children' => $include_children,
+                'hide_empty' => true,
+                'include_children' => false,
             ]);
             return $terms;
         }
 
         $post_ids = get_posts([
-              'post_type'      => 'rrze-kb-article',
-              'post_status'    => 'publish',
-              'posts_per_page' => -1,
-              'fields'         => 'ids',
-              'tax_query' => [
-                  'relation' => 'OR',
-                  [
-                      'taxonomy' => 'rrze-kb-target-group',
-                      'field'    => 'slug',
-                      'terms'    => $target_group,
-                  ],
-                  [
-                      'taxonomy' => 'rrze-kb-target-group',
-                      'operator' => 'NOT EXISTS',
-                  ],
-              ]
-          ]);
-
+            'post_type'      => 'rrze-kb-article',
+            'post_status'    => 'publish',
+            'posts_per_page' => -1,
+            'fields'         => 'ids',
+            'tax_query' => [
+                'relation' => 'OR',
+                [
+                    'taxonomy' => 'rrze-kb-target-group',
+                    'field'    => 'slug',
+                    'terms'    => $target_group,
+                ],
+                [
+                    'taxonomy' => 'rrze-kb-target-group',
+                    'operator' => 'NOT EXISTS',
+                ],
+            ]
+        ]);
+        $term_parents = [];
         if (!empty($post_ids)) {
             $terms = wp_get_object_terms($post_ids, 'rrze-kb-category', [
                 'orderby' => 'name',
-                'include_children' => $include_children,
             ]);
-        } else {
-            $terms = [];
+            foreach ($terms as $term) {
+                $parent = self::get_term_top_parent($term->term_id, 'rrze-kb-category');
+                $term_parents[$parent->term_id] = $parent;
+            }
         }
-        return $terms;
+
+        /*$term_parents = array_filter($term_parents, function($term) use ($parentId) {
+            return (int)$term->parent === (int)$parentId;
+        });*/
+
+        uasort($term_parents, function ($a, $b) {
+            return strcasecmp($a->name, $b->name);
+        });
+        return $term_parents;
     }
 
 }

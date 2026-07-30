@@ -105,19 +105,38 @@
             }
         }
         .rrze-kb-target-group-select {
-            gap: 0;
+            gap: 10px;
             select,
             button {
                 font-size: var(--P-Body-Text-Small, 1rem);
             }
             select {
-                border-color: var(--FAU-Col-FAU-Blau-100, #04316a);
-                border-right-color: #fff;
+                border: 0;
+                border-bottom: 4px solid var(--FAU-Col-FAU-Blau-100, #04316a);
+                //border-color: var(--FAU-Col-FAU-Blau-100, #04316a);
+                //border-right-color: #fff;
             }
             button {
-                background-color: var(--FAU-Col-FAU-Dunkelblau-100, #041e42);
+                background-color: var(--FAU-Col-FAU-Blau-100, #04316a);
                 color: #fff;
-                border-color: var(--FAU-Col-FAU-Dunkelblau-100, #041e42);
+                border-color: var(--FAU-Col-FAU-Blau-100, #04316a);
+            }
+        }
+        .rrze-kb-sidebar .rrze-kb-target-group-select {
+            column-gap: 10px;
+            row-gap: 0;
+            select {
+                flex-grow: 1;
+            }
+            button {
+                background-color: #fff;
+                color: var(--FAU-Col-FAU-Blau-100, #04316a);
+                border: 2px solid var(--FAU-Col-FAU-Blau-100, #04316a);
+                letter-spacing: var(--letter-spacing-small, 0.01rem);
+                &:hover, &:focus, &:active {
+                    background-color: var(--FAU-Col-FAU-Blau-100, #04316a);
+                    color: #fff;
+                }
             }
         }
     }
