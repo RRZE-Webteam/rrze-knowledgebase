@@ -221,13 +221,18 @@ class Output
 
         // Context Menu
         if (!empty($context_menu)) {
+            $output .= '<div class="rrze-kb-sidebar">';
+            if ($this->has_target_groups) {
+                $output .= '<div class="rrze-kb-target-group">' . Helper::render_target_group_dropdown($this->target_group, $this->target_group_color) . '</div>';
+            }
             $output .= '<nav class="rrze-kb-context-menu" aria-label="' . __('Side Menu', 'rrze-knowledgebase') . '">' . $context_menu . '</nav>';
+            $output .= '</div>';
         }
         $output .='</div></div>';
 
         wp_enqueue_style('dashicons');
         wp_enqueue_script('rrze-knowledgebase-script');
-        return wp_kses_post($output);
+        return $output;
     }
 
     private function render_subcategories($subcategories, $target_group = ''): string

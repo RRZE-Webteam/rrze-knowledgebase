@@ -74,10 +74,10 @@ class Settings
                     Data
                 </a>
 
-                <a href="?page=rrze-kb-settings&tab=layout"
-                   class="nav-tab <?php echo $active_tab === 'layout' ? 'nav-tab-active' : ''; ?>">
+                <!--<a href="?page=rrze-kb-settings&tab=layout"
+                   class="nav-tab <?php //echo $active_tab === 'layout' ? 'nav-tab-active' : ''; ?>">
                     Layout
-                </a>
+                </a>-->
             </h2>
 
             <form method="post" action="options.php">
